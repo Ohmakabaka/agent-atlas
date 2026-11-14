@@ -64,9 +64,9 @@
   },
   {
     "id": "relation-mcp-implementation",
-    "type": "references",
+    "type": "related_to",
     "status": "confirmed",
-    "description": "MCP 发布与协议规范构成同一协议的说明入口；规范是版本化的后续资料。",
+    "description": "MCP 发布与协议规范构成同一协议的说明入口；此关联不表示规范直接引用发布公告。",
     "evidenceUrl": "https://modelcontextprotocol.io/specification/2025-06-18",
     "fromArticleId": "article-mcp-spec",
     "toArticleId": "article-mcp-announcement"
