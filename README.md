@@ -20,7 +20,21 @@ Agent Atlas 1.0 是面向中文 AI 工程师的开源知识平台。读者可以
 - **部署与运营**：Node.js 或非 root Docker/Compose、健康检查、在线一致性备份、受确认保护的离线恢复、无密钥构建和运行时认证配置。
 - **阅读体验**：中文优先、响应式、浅色/深色模式、空状态、错误反馈；配置公开站点地址后提供 canonical、RSS、sitemap 和结构化元数据。
 
-初始数据包含 7 个主要方向、44 个细分主题、27 条公开资料和 3 个完整专题。内容 JSON 与代码分离；后续采集生成待审核记录，不计入已发布资料数量。公开页面保留原始出处，不默认重新发布第三方全文。
+初始数据包含 7 个主要方向、44 个细分主题、27 条外部资料、6 篇本站原创指南（共 33 条公开内容）和 3 个完整专题。原创指南由 Codex 辅助创作，附实际核查的固定版本来源，并单独标明人工复核状态。内容 JSON 与代码分离；后续采集生成待审核记录，不计入已发布资料数量。
+
+## 发布到 Render
+
+按 [Render 上线步骤](docs/render.md)，在 [Render Dashboard](https://dashboard.render.com/) 新建 Blueprint，连接本仓库并选择 **`work` 分支**。根目录 [render.yaml](render.yaml) 会配置完整网站、1 GB 持久数据库磁盘、随机私密编辑凭证与健康检查。创建前核对平台当前主机和磁盘报价。
+
+平台分配 HTTPS 地址后，网站自动使用 `RENDER_EXTERNAL_URL` 生成站点索引；绑定自定义域名时再配置 `SITE_URL`。首次启动会导入全部 33 条内容。当前仓库仅完成部署准备，实际公网地址以你创建的 Render 服务为准。
+
+## 用 Codex 额度启动内容
+
+本轮六篇指南使用当前 Codex 会话编写和核查，没有调用网站的模型 API。原稿见 [content/guides](content/guides)，覆盖架构选型、上下文预算、MCP、记忆、评测与可靠执行；首页“把概念用起来”可直接阅读。
+
+继续生成内容时，让 Codex 编写 `data/editorial/*.json`，运行 `npm run content:render` 保存 Markdown 原稿，再执行 `npm run content:check`。提交推送并部署后，运行 `npm run content:import` 追加为待审核内容，最后在后台核对发布；既有编辑不会被重新导入覆盖。详见 [Codex 内容流程](docs/codex-content.md)。
+
+Codex 会话额度不能作为部署网站的模型 API 余额。当前 Render 配置保持 `AI_API_KEY` 为空，网站不会自行消耗模型 API 费用；后续自动生成需要单独的 API 凭证和计费配置。
 
 ## 本地启动
 
@@ -90,6 +104,9 @@ Compose 默认绑定主机回环地址。正式访问应通过 HTTPS 反向代�
 | `npm run db:migrate`                                  | 应用已提交迁移                                               |
 | `npm run db:seed`                                     | 追加缺失种子，保留已有编辑                                   |
 | `npm run db:init`                                     | 一键初始化或补齐数据库                                       |
+| `npm run content:render`                              | 将原创内容 JSON 渲染为可提交的 Markdown 原稿                 |
+| `npm run content:check`                               | 校验内容包、原稿一致性、主题与重复条目，不写入数据库         |
+| `npm run content:import`                              | 追加原创内容，默认待审核；`-- --publish` 仅显式发布新条目    |
 | `npm run typecheck`                                   | TypeScript 检查                                              |
 | `npm test`                                            | 单元与隔离数据库集成测试                                     |
 | `npm run build` / `npm start`                         | 构建、启动生产服务                                           |
@@ -123,7 +140,8 @@ GitHub Actions 配置检查数据库初始化、类型、单元/数据库测试�
 | `DATABASE_URL`                                                 | 默认 `file:./dev.db`，相对 `prisma/`；生产使用持久目录的绝对 `file:` 路径                       |
 | `ADMIN_PASSWORD`                                               | 后台口令，至少 12 字符，无默认值；更换后旧编辑会话失效                                          |
 | `SESSION_SECRET`                                               | 至少 32 字符，用于会话与匿名客户端签名；更换后旧会话失效                                        |
-| `SITE_URL`                                                     | 实际公开站点根地址；未配置不生成虚假的 canonical，RSS 不可用、sitemap 为空                      |
+| `SITE_URL`                                                     | 实际公开站点根地址，优先于平台域名；两者都未配置时不生成 canonical，RSS 不可用、sitemap 为空    |
+| `RENDER_EXTERNAL_URL`                                          | Render 自动提供的 HTTPS 地址；未配置 `SITE_URL` 时使用，不手工编造                              |
 | `PORT`                                                         | Web 端口，默认 3000                                                                             |
 | `ALLOW_INSECURE_ADMIN_COOKIE`                                  | 默认 `false`；仅本机 HTTP 生产构建验收设为 `true`，正式部署使用 HTTPS                           |
 | `TRUST_PROXY`                                                  | 默认 `false`；仅在受控反向代理后启用                                                            |
@@ -147,11 +165,13 @@ src/app/                 公开页面、后台、健康与公开资料接口
 src/components/          导航、图谱、阅读控件、文章卡片
 src/lib/search/          参数绑定检索、关系与 SEO
 src/lib/editor/          版本化编辑、主题层级与引用保护
+src/lib/editorial/       Codex 内容包校验、原稿渲染与幂等导入
 src/lib/ingestion/       适配器、安全传输、去重与持久调度
 src/lib/ai/              可替换模型接口与草稿处理
 src/lib/auth.ts          会话、持久限流与认证审计
 prisma/                  模型、迁移与种子程序
 data/                    可独立贡献的主题、资料、来源和关系 JSON
+content/guides/          可阅读、可核对的本站原创 Markdown 原稿
 scripts/                 同步、worker、备份与恢复
 tests/                   单元、数据库与浏览器验证
 docs/                    架构、内容准则、部署、运维与截图
@@ -159,6 +179,7 @@ docs/                    架构、内容准则、部署、运维与截图
 
 - [架构与数据模型](docs/architecture.md)
 - [部署说明](docs/deployment.md) · [健康检查、备份与恢复](docs/operations.md)
+- [Render 上线步骤](docs/render.md) · [Codex 内容流程](docs/codex-content.md)
 - [采集适配器与代理](docs/ingestion.md)
 - [内容与主题格式](docs/content.md) · [贡献指南](CONTRIBUTING.md)
 

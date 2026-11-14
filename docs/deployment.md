@@ -2,6 +2,8 @@
 
 Agent Atlas 支持 Node.js 24+ 单实例服务或 Docker Compose。Web 和可选采集 worker 共享一个持久 SQLite 数据库。本文描述部署步骤；不代表项目已部署到某个公网域名。健康、备份、恢复的详细操作见 [operations.md](operations.md)。
 
+本项目已提供 [Render Blueprint](../render.yaml)，适合先用平台 HTTPS 域名发布完整网站，具体操作和费用边界见 [Render 上线步骤](render.md)。Render 中 `SITE_URL` 可留空，自动使用平台注入的 `RENDER_EXTERNAL_URL`。
+
 ## 先准备配置
 
 首次复制 `.env.example` 到 `.env`，已有配置不要覆盖。设置至少 12 字符的 `ADMIN_PASSWORD`、至少 32 字符的 `SESSION_SECRET`，以及实际站点根地址 `SITE_URL`。凭证在运行时注入，构建不要求编辑口令，也不应把 `.env` 放进镜像。

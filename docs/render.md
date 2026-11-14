@@ -15,16 +15,16 @@ Render 提供 `RENDER_EXTERNAL_URL`，应用在未显式配置 `SITE_URL` 时将
 
 ## 配置与费用边界
 
-| 配置 | 蓝图默认值与用途 |
-| --- | --- |
-| `plan: starter` | 支持持久磁盘的入门付费实例；创建前确认平台当前规格与价格 |
-| `numInstances: 1` | 单实例 SQLite；不要直接扩为多个 Web 实例 |
-| `/app/storage` | 持久磁盘挂载点，数据库为 `atlas.db`；应用的 `/app/data` 另存种子 JSON |
-| `ADMIN_PASSWORD`、`SESSION_SECRET` | 由 Render `generateValue` 创建的私密环境值；不写入 Git |
-| `AI_API_KEY` | 空值；网站不自动调用付费模型服务 |
-| `ALLOW_INSECURE_ADMIN_COOKIE` | `false`；通过平台 HTTPS 访问后台 |
-| `TRUST_PROXY` | `false`；不假设 Render 转发头是已验证的单一客户端 IP |
-| `autoDeploy: false` | 推送代码后由控制台手动部署，便于先备份与核对内容 |
+| 配置                               | 蓝图默认值与用途                                                      |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| `plan: starter`                    | 支持持久磁盘的入门付费实例；创建前确认平台当前规格与价格              |
+| `numInstances: 1`                  | 单实例 SQLite；不要直接扩为多个 Web 实例                              |
+| `/app/storage`                     | 持久磁盘挂载点，数据库为 `atlas.db`；应用的 `/app/data` 另存种子 JSON |
+| `ADMIN_PASSWORD`、`SESSION_SECRET` | 由 Render `generateValue` 创建的私密环境值；不写入 Git                |
+| `AI_API_KEY`                       | 空值；网站不自动调用付费模型服务                                      |
+| `ALLOW_INSECURE_ADMIN_COOKIE`      | `false`；通过平台 HTTPS 访问后台                                      |
+| `TRUST_PROXY`                      | `false`；不假设 Render 转发头是已验证的单一客户端 IP                  |
+| `autoDeploy: false`                | 推送代码后由控制台手动部署，便于先备份与核对内容                      |
 
 现阶段通过 Codex 会话整理内容，再随代码发布；这使用当前 Codex 会话额度。部署后的 Web 服务无法把 Codex 登录额度当成模型 API Key。若将来需要网站自行生成导读，再单独配置模型提供商、API 凭证和费用限额。
 
