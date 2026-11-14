@@ -1,0 +1,26 @@
+[
+  {
+    "id": "person-shunyu-yao",
+    "name": "Shunyu Yao",
+    "organizationId": "org-princeton",
+    "articleSlugs": [
+      "react"
+    ]
+  },
+  {
+    "id": "person-charles-packer",
+    "name": "Charles Packer",
+    "organizationId": "org-berkeley",
+    "articleSlugs": [
+      "memgpt"
+    ]
+  },
+  {
+    "id": "person-joon-sung-park",
+    "name": "Joon Sung Park",
+    "organizationId": "org-stanford",
+    "articleSlugs": [
+      "generative-agents"
+    ]
+  }
+]

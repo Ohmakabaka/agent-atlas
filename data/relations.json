@@ -1,0 +1,110 @@
+[
+  {
+    "id": "relation-react-explains",
+    "type": "explains",
+    "status": "confirmed",
+    "description": "原始资料明确讨论该主题；此关联不表示与其他资料存在技术继承。",
+    "evidenceUrl": "https://arxiv.org/abs/2210.03629",
+    "fromArticleId": "article-react",
+    "toTopicId": "topic-react"
+  },
+  {
+    "id": "relation-mcp-spec-explains",
+    "type": "explains",
+    "status": "confirmed",
+    "description": "原始资料明确讨论该主题；此关联不表示与其他资料存在技术继承。",
+    "evidenceUrl": "https://modelcontextprotocol.io/specification/2025-06-18",
+    "fromArticleId": "article-mcp-spec",
+    "toTopicId": "topic-mcp"
+  },
+  {
+    "id": "relation-swe-bench-explains",
+    "type": "explains",
+    "status": "confirmed",
+    "description": "原始资料明确讨论该主题；此关联不表示与其他资料存在技术继承。",
+    "evidenceUrl": "https://arxiv.org/abs/2310.06770",
+    "fromArticleId": "article-swe-bench",
+    "toTopicId": "topic-benchmarks"
+  },
+  {
+    "id": "relation-context-engineering-explains",
+    "type": "explains",
+    "status": "confirmed",
+    "description": "原始资料明确讨论该主题；此关联不表示与其他资料存在技术继承。",
+    "evidenceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "fromArticleId": "article-context-engineering",
+    "toTopicId": "topic-context-engineering"
+  },
+  {
+    "id": "relation-building-effective-agents-explains",
+    "type": "explains",
+    "status": "confirmed",
+    "description": "原始资料明确讨论该主题；此关联不表示与其他资料存在技术继承。",
+    "evidenceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "fromArticleId": "article-building-effective-agents",
+    "toTopicId": "topic-workflow-vs-agent"
+  },
+  {
+    "id": "relation-memgpt-explains",
+    "type": "explains",
+    "status": "confirmed",
+    "description": "原始资料明确讨论该主题；此关联不表示与其他资料存在技术继承。",
+    "evidenceUrl": "https://arxiv.org/abs/2310.08560",
+    "fromArticleId": "article-memgpt",
+    "toTopicId": "topic-memory"
+  },
+  {
+    "id": "relation-long-running-harness-explains",
+    "type": "explains",
+    "status": "confirmed",
+    "description": "原始资料明确讨论该主题；此关联不表示与其他资料存在技术继承。",
+    "evidenceUrl": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+    "fromArticleId": "article-long-running-harness",
+    "toTopicId": "topic-agent-harness"
+  },
+  {
+    "id": "relation-mcp-implementation",
+    "type": "references",
+    "status": "confirmed",
+    "description": "MCP 发布与协议规范构成同一协议的说明入口；规范是版本化的后续资料。",
+    "evidenceUrl": "https://modelcontextprotocol.io/specification/2025-06-18",
+    "fromArticleId": "article-mcp-spec",
+    "toArticleId": "article-mcp-announcement"
+  },
+  {
+    "id": "relation-context-memory",
+    "type": "related_to",
+    "status": "confirmed",
+    "description": "MemGPT 同时讨论上下文窗口和外部记忆，支持这两个主题间的一般关联。",
+    "evidenceUrl": "https://arxiv.org/abs/2310.08560",
+    "fromTopicId": "topic-context-engineering",
+    "toTopicId": "topic-memory"
+  },
+  {
+    "id": "relation-eval-engineering",
+    "type": "related_to",
+    "status": "confirmed",
+    "description": "SWE-agent 将代码工具接口与 SWE-bench 任务评价结合。",
+    "evidenceUrl": "https://arxiv.org/abs/2405.15793",
+    "fromTopicId": "topic-evaluation",
+    "toTopicId": "topic-engineering"
+  },
+  {
+    "id": "relation-architecture-tools",
+    "type": "related_to",
+    "status": "confirmed",
+    "description": "ReAct 在推理与外部行动之间交替执行，连接架构与工具使用。",
+    "evidenceUrl": "https://arxiv.org/abs/2210.03629",
+    "fromTopicId": "topic-architecture",
+    "toTopicId": "topic-tool-use"
+  },
+  {
+    "id": "relation-suggested-community-context",
+    "type": "related_to",
+    "status": "suggested",
+    "description": "主题重合的自动关联示例，未经人工确认，不作为直接引用或继承展示。",
+    "evidenceUrl": null,
+    "fromArticleId": "article-llm-universe",
+    "toArticleId": "article-context-engineering"
+  }
+]

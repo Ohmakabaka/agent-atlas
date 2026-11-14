@@ -1,0 +1,171 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id       String @id @default(cuid())
+  slug     String @unique
+  name     String
+  url      String
+  sources  Source[]
+  articles Article[]
+  people   Person[]
+}
+
+model Person {
+  id             String @id @default(cuid())
+  name           String
+  url            String?
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  articles       ArticlePerson[]
+}
+
+model Topic {
+  id           String @id @default(cuid())
+  slug         String @unique
+  name         String
+  englishName  String
+  description  String
+  question     String
+  concepts     Json @default("[]")
+  readingPath  Json @default("[]")
+  featured     Boolean @default(false)
+  sortOrder    Int @default(0)
+  color        String @default("teal")
+  parentId     String?
+  parent       Topic? @relation("TopicTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children     Topic[] @relation("TopicTree")
+  articles     ArticleTopic[]
+  outgoing     Relation[] @relation("FromTopic")
+  incoming     Relation[] @relation("ToTopic")
+}
+
+model Source {
+  id             String @id @default(cuid())
+  slug           String @unique
+  name           String
+  type           String
+  platform       String
+  url            String @unique
+  feedUrl        String?
+  description    String @default("")
+  enabled        Boolean @default(true)
+  lastCheckedAt  DateTime?
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  articles       Article[]
+  jobs           IngestionJob[]
+}
+
+model Article {
+  id             String @id @default(cuid())
+  slug           String @unique
+  title          String
+  originalTitle  String
+  url            String
+  canonicalUrl   String @unique
+  summary        String @default("")
+  takeaways      Json @default("[]")
+  audience       String @default("")
+  type           String @default("article")
+  layer          String @default("primary")
+  language       String @default("en")
+  quality        String @default("standard")
+  status         String @default("pending_review")
+  publishedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  reviewedAt     DateTime?
+  authorName     String @default("")
+  rawMetadata    Json @default("{}")
+  aiDraft        Json @default("{}")
+  sourceId       String?
+  source         Source? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  topics         ArticleTopic[]
+  people         ArticlePerson[]
+  links          ArticleLink[]
+  engineeringCase EngineeringCase?
+  outgoing       Relation[] @relation("FromArticle")
+  incoming       Relation[] @relation("ToArticle")
+  @@index([status, publishedAt])
+  @@index([sourceId, status])
+  @@index([layer, type, language])
+}
+
+model ArticleTopic {
+  articleId String
+  topicId   String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  topic     Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  @@id([articleId, topicId])
+}
+
+model ArticlePerson {
+  articleId String
+  personId  String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  person    Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+  @@id([articleId, personId])
+}
+
+model ArticleLink {
+  id        String @id @default(cuid())
+  articleId String
+  url       String @unique
+  label     String @default("原始链接")
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model EngineeringCase {
+  id           String @id @default(cuid())
+  articleId    String @unique
+  problem      String
+  architecture String
+  solution     String
+  outcome      String
+  evidenceUrl  String
+  article      Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model Relation {
+  id            String @id @default(cuid())
+  type          String
+  status        String @default("suggested")
+  description   String @default("")
+  evidenceUrl   String?
+  fromArticleId String?
+  toArticleId   String?
+  fromTopicId   String?
+  toTopicId     String?
+  fromArticle   Article? @relation("FromArticle", fields: [fromArticleId], references: [id], onDelete: Cascade)
+  toArticle     Article? @relation("ToArticle", fields: [toArticleId], references: [id], onDelete: Cascade)
+  fromTopic     Topic? @relation("FromTopic", fields: [fromTopicId], references: [id], onDelete: Cascade)
+  toTopic       Topic? @relation("ToTopic", fields: [toTopicId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  @@index([status, fromArticleId])
+  @@index([status, fromTopicId])
+}
+
+model IngestionJob {
+  id          String @id @default(cuid())
+  adapter     String
+  status      String @default("running")
+  sourceId    String?
+  source      Source? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  startedAt   DateTime @default(now())
+  finishedAt  DateTime?
+  imported    Int @default(0)
+  duplicates  Int @default(0)
+  failed      Int @default(0)
+  error       String?
+  details     Json @default("{}")
+}

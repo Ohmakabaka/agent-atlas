@@ -1,0 +1,80 @@
+[
+  {
+    "id": "org-anthropic",
+    "slug": "anthropic",
+    "name": "Anthropic",
+    "url": "https://www.anthropic.com"
+  },
+  {
+    "id": "org-openai",
+    "slug": "openai",
+    "name": "OpenAI",
+    "url": "https://openai.com"
+  },
+  {
+    "id": "org-google-deepmind",
+    "slug": "google-deepmind",
+    "name": "Google DeepMind",
+    "url": "https://deepmind.google"
+  },
+  {
+    "id": "org-google-research",
+    "slug": "google-research",
+    "name": "Google Research",
+    "url": "https://research.google"
+  },
+  {
+    "id": "org-princeton",
+    "slug": "princeton",
+    "name": "Princeton NLP",
+    "url": "https://princeton-nlp.github.io"
+  },
+  {
+    "id": "org-berkeley",
+    "slug": "berkeley",
+    "name": "UC Berkeley",
+    "url": "https://bair.berkeley.edu"
+  },
+  {
+    "id": "org-stanford",
+    "slug": "stanford",
+    "name": "Stanford University",
+    "url": "https://www.stanford.edu"
+  },
+  {
+    "id": "org-meta",
+    "slug": "meta",
+    "name": "Meta AI",
+    "url": "https://ai.meta.com"
+  },
+  {
+    "id": "org-datawhale",
+    "slug": "datawhale",
+    "name": "Datawhale",
+    "url": "https://datawhale.club"
+  },
+  {
+    "id": "org-langgenius",
+    "slug": "langgenius",
+    "name": "LangGenius",
+    "url": "https://dify.ai"
+  },
+  {
+    "id": "org-microsoft",
+    "slug": "microsoft",
+    "name": "Microsoft Research",
+    "url": "https://www.microsoft.com/research"
+  },
+  {
+    "id": "org-alibaba",
+    "slug": "alibaba",
+    "name": "阿里巴巴 · AgentScope",
+    "url": "https://github.com/agentscope-ai"
+  },
+  {
+    "id": "org-bytedance",
+    "slug": "bytedance",
+    "name": "字节跳动",
+    "url": "https://github.com/bytedance"
+  }
+]

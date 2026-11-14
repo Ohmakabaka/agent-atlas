@@ -1,0 +1,134 @@
+[
+  {
+    "id": "source-anthropic-engineering",
+    "slug": "anthropic-engineering",
+    "name": "Anthropic Engineering",
+    "type": "official",
+    "platform": "official",
+    "url": "https://www.anthropic.com/engineering",
+    "organizationId": "org-anthropic",
+    "description": "直接来自构建者的 Agent 架构、上下文与可靠性经验。",
+    "feedUrl": null
+  },
+  {
+    "id": "source-anthropic-news",
+    "slug": "anthropic-news",
+    "name": "Anthropic News",
+    "type": "official",
+    "platform": "official",
+    "url": "https://www.anthropic.com/news",
+    "organizationId": "org-anthropic",
+    "description": "模型与协议的官方发布。",
+    "feedUrl": null
+  },
+  {
+    "id": "source-openai",
+    "slug": "openai",
+    "name": "OpenAI",
+    "type": "official",
+    "platform": "official",
+    "url": "https://openai.com/news/",
+    "organizationId": "org-openai",
+    "description": "OpenAI 的研究、产品和开发者技术说明。",
+    "feedUrl": "https://openai.com/news/rss.xml"
+  },
+  {
+    "id": "source-deepmind",
+    "slug": "deepmind",
+    "name": "Google DeepMind",
+    "type": "official",
+    "platform": "official",
+    "url": "https://deepmind.google/discover/blog/",
+    "organizationId": "org-google-deepmind",
+    "description": "研究团队的公开技术发布。",
+    "feedUrl": null
+  },
+  {
+    "id": "source-arxiv",
+    "slug": "arxiv",
+    "name": "arXiv",
+    "type": "paper",
+    "platform": "arxiv",
+    "url": "https://arxiv.org",
+    "organizationId": null,
+    "description": "预印本原始论文。论文实验结果不等同于生产保证。",
+    "feedUrl": null
+  },
+  {
+    "id": "source-github",
+    "slug": "github",
+    "name": "GitHub · 开源实现",
+    "type": "repository",
+    "platform": "github",
+    "url": "https://github.com",
+    "organizationId": null,
+    "description": "公开代码仓库、文档与可复现实现。",
+    "feedUrl": null
+  },
+  {
+    "id": "source-datawhale",
+    "slug": "datawhale",
+    "name": "Datawhale 开源社区",
+    "type": "community",
+    "platform": "github",
+    "url": "https://github.com/datawhalechina",
+    "organizationId": "org-datawhale",
+    "description": "中文开源学习资料与社区实践。",
+    "feedUrl": null
+  },
+  {
+    "id": "source-dify",
+    "slug": "dify",
+    "name": "Dify 开源项目",
+    "type": "engineering",
+    "platform": "github",
+    "url": "https://github.com/langgenius/dify",
+    "organizationId": "org-langgenius",
+    "description": "可自托管的 LLM 应用开发平台与工程实现。",
+    "feedUrl": null
+  },
+  {
+    "id": "source-mcp-docs",
+    "slug": "mcp-docs",
+    "name": "Model Context Protocol",
+    "type": "docs",
+    "platform": "docs",
+    "url": "https://modelcontextprotocol.io",
+    "organizationId": "org-anthropic",
+    "description": "MCP 协议规范与 SDK 参考。",
+    "feedUrl": null
+  },
+  {
+    "id": "source-wechat",
+    "slug": "wechat",
+    "name": "微信公众号 · 人工收录",
+    "type": "community",
+    "platform": "wechat",
+    "url": "https://mp.weixin.qq.com",
+    "organizationId": null,
+    "description": "支持编辑人工提交链接与元数据，不依赖非官方抓取。",
+    "feedUrl": null
+  },
+  {
+    "id": "source-agentscope",
+    "slug": "agentscope",
+    "name": "AgentScope 开源项目",
+    "type": "engineering",
+    "platform": "github",
+    "url": "https://github.com/agentscope-ai/agentscope",
+    "organizationId": "org-alibaba",
+    "description": "可核对的 Agent 编排与运行时开源实现。",
+    "feedUrl": null
+  },
+  {
+    "id": "source-deer-flow",
+    "slug": "deer-flow",
+    "name": "字节跳动 · DeerFlow",
+    "type": "engineering",
+    "platform": "github",
+    "url": "https://github.com/bytedance/deer-flow",
+    "organizationId": "org-bytedance",
+    "description": "长任务 Agent harness 的公开实现，包含沙箱、工具、记忆与子 Agent。",
+    "feedUrl": null
+  }
+]

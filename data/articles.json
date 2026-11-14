@@ -1,0 +1,871 @@
+[
+  {
+    "id": "article-react",
+    "slug": "react",
+    "title": "ReAct：让推理与行动相互反馈",
+    "originalTitle": "ReAct: Synergizing Reasoning and Acting in Language Models",
+    "url": "https://arxiv.org/abs/2210.03629",
+    "canonicalUrl": "https://arxiv.org/abs/2210.03629",
+    "publishedAt": "2022-10-06",
+    "sourceId": "source-arxiv",
+    "organizationId": "org-princeton",
+    "authorName": "Shunyu Yao 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "ReAct 在任务执行中交替生成推理轨迹与动作，使模型能利用外部反馈更新计划。论文在问答与交互环境中比较这一方法和仅推理、仅行动的基线；应结合具体实验设置理解结论。",
+    "takeaways": [
+      "推理轨迹用于制定、跟踪和调整行动计划。",
+      "行动从外部环境获得信息，并为后续推理提供反馈。",
+      "论文中的基准收益不直接代表任意生产任务的效果。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "architecture",
+      "react",
+      "agent-loop",
+      "planning"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-toolformer",
+    "slug": "toolformer",
+    "title": "Toolformer：学习何时调用工具",
+    "originalTitle": "Toolformer: Language Models Can Teach Themselves to Use Tools",
+    "url": "https://arxiv.org/abs/2302.04761",
+    "canonicalUrl": "https://arxiv.org/abs/2302.04761",
+    "publishedAt": "2023-02-09",
+    "sourceId": "source-arxiv",
+    "organizationId": "org-meta",
+    "authorName": "Timo Schick 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "论文探索如何通过自监督方式构造 API 调用示例，让语言模型学习选择工具、填写参数并利用返回值。它讨论的是训练方法，而非面向生产的权限或执行框架。",
+    "takeaways": [
+      "用候选 API 调用与损失变化筛选训练示例。",
+      "工具包含计算器、搜索、翻译等。",
+      "工具选择能力与执行安全是不同问题。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "tool-use",
+      "tool-selection",
+      "function-calling"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-generative-agents",
+    "slug": "generative-agents",
+    "title": "生成式智能体：记忆、反思与规划",
+    "originalTitle": "Generative Agents: Interactive Simulacra of Human Behavior",
+    "url": "https://arxiv.org/abs/2304.03442",
+    "canonicalUrl": "https://arxiv.org/abs/2304.03442",
+    "publishedAt": "2023-04-07",
+    "sourceId": "source-arxiv",
+    "organizationId": "org-stanford",
+    "authorName": "Joon Sung Park 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "研究用记忆流、检索、反思与规划构建沙盒中的生成式角色。它提供了一种组织经历与高层反思的架构实例，实验目标是行为可信度，不应将其等同于通用任务可靠性。",
+    "takeaways": [
+      "记忆检索综合相关性、近期性和重要性。",
+      "反思把具体观察整理为更高层的信息。",
+      "评价目标和环境决定了方法的适用范围。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "memory",
+      "memory-retrieval",
+      "memory-consolidation",
+      "planning"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-reflexion",
+    "slug": "reflexion",
+    "title": "Reflexion：用语言反馈改进后续尝试",
+    "originalTitle": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+    "url": "https://arxiv.org/abs/2303.11366",
+    "canonicalUrl": "https://arxiv.org/abs/2303.11366",
+    "publishedAt": "2023-03-20",
+    "sourceId": "source-arxiv",
+    "organizationId": null,
+    "authorName": "Noah Shinn 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "Reflexion 将任务反馈转化为语言形式的反思，并在后续尝试中重新使用。论文分别研究决策、推理和编程环境，为“保存什么反馈”提供了可讨论的实现思路。",
+    "takeaways": [
+      "以文本记忆承载反馈，不要求在每次任务后更新模型参数。",
+      "改进依赖可获得且有意义的反馈信号。",
+      "多次尝试的成本与单次成功率需要分别评估。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "memory",
+      "long-term-memory",
+      "agent-evals",
+      "reliability"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-memgpt",
+    "slug": "memgpt",
+    "title": "MemGPT：分层管理有限上下文",
+    "originalTitle": "MemGPT: Towards LLMs as Operating Systems",
+    "url": "https://arxiv.org/abs/2310.08560",
+    "canonicalUrl": "https://arxiv.org/abs/2310.08560",
+    "publishedAt": "2023-10-12",
+    "sourceId": "source-arxiv",
+    "organizationId": "org-berkeley",
+    "authorName": "Charles Packer 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "MemGPT 借鉴操作系统中的内存层级，在有限上下文与外部存储之间移动信息。它展示了长对话和文档任务中的设计方法，也提醒开发者区分上下文容量与可检索的持久记忆。",
+    "takeaways": [
+      "区分模型可见的主上下文和外部存储。",
+      "通过函数调用让模型参与信息的读取和写回。",
+      "记忆的检索与更新策略仍需针对任务评估。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "memory",
+      "context-engineering",
+      "context-window",
+      "persistent-state",
+      "long-term-memory"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-swe-bench",
+    "slug": "swe-bench",
+    "title": "SWE-bench：以真实 GitHub 问题评估代码能力",
+    "originalTitle": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+    "url": "https://arxiv.org/abs/2310.06770",
+    "canonicalUrl": "https://arxiv.org/abs/2310.06770",
+    "publishedAt": "2023-10-10",
+    "sourceId": "source-arxiv",
+    "organizationId": "org-princeton",
+    "authorName": "Carlos E. Jimenez 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "SWE-bench 把真实仓库中的问题描述与修复验证组织为评测任务。阅读时应关注环境复现、测试判定和数据划分，避免把一个基准分数当作全部软件工程能力。",
+    "takeaways": [
+      "任务来自真实 GitHub issue 与配套代码仓库。",
+      "测试是可执行的判定依据，但其覆盖范围有限。",
+      "比较方案需要对齐数据版本与运行条件。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "evaluation",
+      "agent-evals",
+      "benchmarks",
+      "coding-agent",
+      "regression-testing"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-webarena",
+    "slug": "webarena",
+    "title": "WebArena：在可复现网站环境中评测 Agent",
+    "originalTitle": "WebArena: A Realistic Web Environment for Building Autonomous Agents",
+    "url": "https://arxiv.org/abs/2307.13854",
+    "canonicalUrl": "https://arxiv.org/abs/2307.13854",
+    "publishedAt": "2023-07-26",
+    "sourceId": "source-arxiv",
+    "organizationId": null,
+    "authorName": "Shuyan Zhou 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "WebArena 提供模拟真实网站的环境与任务集合，用于研究网页操作 Agent。任务完成情况需要结合环境状态进行验证，而不只是看模型是否宣称成功。",
+    "takeaways": [
+      "网站环境包含多个常见交互模式。",
+      "任务可通过执行后的状态检查评估。",
+      "环境版本和初始化状态是复现的重要条件。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "evaluation",
+      "browser-agent",
+      "browser-automation",
+      "task-success-rate"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-osworld",
+    "slug": "osworld",
+    "title": "OSWorld：面向桌面操作的执行式评测",
+    "originalTitle": "OSWorld: Benchmarking Multimodal Agents for Open-Ended Tasks in Real Computer Environments",
+    "url": "https://arxiv.org/abs/2404.07972",
+    "canonicalUrl": "https://arxiv.org/abs/2404.07972",
+    "publishedAt": "2024-04-12",
+    "sourceId": "source-arxiv",
+    "organizationId": null,
+    "authorName": "Tianbao Xie 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "OSWorld 为多模态 Agent 提供真实计算机环境中的任务和执行式评价。它把界面感知、操作和任务结果放在同一评测链路中，适合研究桌面自动化的失败模式。",
+    "takeaways": [
+      "真实应用环境比静态截图问答包含更多执行约束。",
+      "判定器围绕任务完成后的环境状态设计。",
+      "应记录重置方式、模型和交互步数限制。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "evaluation",
+      "benchmarks",
+      "trajectory-evaluation",
+      "browser-automation"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-swe-agent",
+    "slug": "swe-agent",
+    "title": "SWE-agent：为语言模型设计计算机接口",
+    "originalTitle": "SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering",
+    "url": "https://arxiv.org/abs/2405.15793",
+    "canonicalUrl": "https://arxiv.org/abs/2405.15793",
+    "publishedAt": "2024-05-24",
+    "sourceId": "source-arxiv",
+    "organizationId": "org-princeton",
+    "authorName": "John Yang 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "SWE-agent 研究面向代码仓库任务的 Agent-Computer Interface。论文把工具界面设计作为影响任务表现的因素，展示搜索、编辑和执行反馈如何配合。",
+    "takeaways": [
+      "工具接口的粒度与错误信息会影响模型行为。",
+      "补丁应通过执行测试验证。",
+      "结论建立在论文选定的任务和运行配置上。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "engineering",
+      "coding-agent",
+      "tool-use",
+      "code-execution"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-building-effective-agents",
+    "slug": "building-effective-agents",
+    "title": "构建高效 Agent：从简单模式开始",
+    "originalTitle": "Building effective agents",
+    "url": "https://www.anthropic.com/engineering/building-effective-agents",
+    "canonicalUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "publishedAt": "2024-12-19",
+    "sourceId": "source-anthropic-engineering",
+    "organizationId": "org-anthropic",
+    "authorName": "Erik Schluntz、Barry Zhang",
+    "type": "article",
+    "layer": "engineering",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "Anthropic 根据实际合作经验区分预定义工作流与由模型动态决定执行路径的 Agent，并介绍路由、并行、编排器与评估优化等模式。文章建议先使用可解释的简单结构，再根据任务需要增加复杂度。",
+    "takeaways": [
+      "Workflow 与 Agent 的关键区别是执行路径由谁决定。",
+      "工具说明、接口和反馈是系统设计的一部分。",
+      "只有当收益足以抵消成本和延迟时才增加复杂度。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "architecture",
+      "workflow-vs-agent",
+      "agent-loop",
+      "multi-agent",
+      "engineering"
+    ],
+    "engineeringCase": {
+      "problem": "不同任务需要的自主性不同，过度编排增加调试成本。",
+      "architecture": "提示链、路由、并行、编排器与自治 Agent 等可组合模式。",
+      "solution": "从简单可组合的结构开始，依据评测增加复杂度。",
+      "outcome": "提供模式与案例讨论；没有可泛化到所有业务的统一收益数字。"
+    }
+  },
+  {
+    "id": "article-mcp-announcement",
+    "slug": "mcp-announcement",
+    "title": "MCP：连接 AI 应用与外部数据的开放协议",
+    "originalTitle": "Introducing the Model Context Protocol",
+    "url": "https://www.anthropic.com/news/model-context-protocol",
+    "canonicalUrl": "https://www.anthropic.com/news/model-context-protocol",
+    "publishedAt": "2024-11-25",
+    "sourceId": "source-anthropic-news",
+    "organizationId": "org-anthropic",
+    "authorName": "Anthropic",
+    "type": "article",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "MCP 发布说明介绍一种连接 AI 应用与工具、数据源的开放协议。它以标准化客户端与服务端接口降低集成的重复工作；权限、凭证和数据边界仍需由具体系统管理。",
+    "takeaways": [
+      "协议标准化的是连接方式，不是工具输出的正确性。",
+      "客户端与服务端分工有利于复用集成。",
+      "访问控制和可信边界需要单独设计。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "tool-use",
+      "mcp",
+      "tool-discovery",
+      "tool-permissions"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-mcp-spec",
+    "slug": "mcp-spec",
+    "title": "MCP 规范：从协议读懂工具与权限边界",
+    "originalTitle": "Model Context Protocol Specification",
+    "url": "https://modelcontextprotocol.io/specification/2025-06-18",
+    "canonicalUrl": "https://modelcontextprotocol.io/specification/2025-06-18",
+    "publishedAt": "2025-06-18",
+    "sourceId": "source-mcp-docs",
+    "organizationId": "org-anthropic",
+    "authorName": "MCP Contributors",
+    "type": "docs",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "阅读固定版本 MCP 规范可以避免把某个 SDK 的行为误认为协议本身。该版本包含生命周期、服务端功能与授权等内容，适合在实现客户端或服务端时逐项核对。",
+    "takeaways": [
+      "明确区分 tools、resources 与 prompts。",
+      "能力协商与生命周期属于协议的一部分。",
+      "实现应针对使用的规范版本测试。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "tool-use",
+      "mcp",
+      "tool-permissions",
+      "tool-discovery"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-context-engineering",
+    "slug": "context-engineering",
+    "title": "上下文工程：管理 Agent 的注意力预算",
+    "originalTitle": "Effective context engineering for AI agents",
+    "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "canonicalUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "publishedAt": "2025-09-29",
+    "sourceId": "source-anthropic-engineering",
+    "organizationId": "org-anthropic",
+    "authorName": "Anthropic Engineering",
+    "type": "article",
+    "layer": "engineering",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "文章把上下文视为有限的注意力预算，讨论提示、工具、检索与历史信息如何共同构成模型的输入。压缩、结构化笔记与子 Agent 是长任务中的不同策略，需要结合保留信息和成本评估。",
+    "takeaways": [
+      "上下文工程关注整个输入集合及其生命周期。",
+      "按需检索可以减少无关信息占据上下文。",
+      "压缩、笔记和隔离各有信息损失及协调成本。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "context-engineering",
+      "context-compression",
+      "context-isolation",
+      "long-running-agents",
+      "rag"
+    ],
+    "engineeringCase": {
+      "problem": "长任务中累积的信息会稀释有效上下文。",
+      "architecture": "系统指令、工具、检索、状态和消息历史组成上下文。",
+      "solution": "按需检索，结合压缩、结构化笔记与子 Agent 隔离。",
+      "outcome": "给出工程策略和权衡，具体效果需要在自己的任务集上验证。"
+    }
+  },
+  {
+    "id": "article-long-running-harness",
+    "slug": "long-running-harness",
+    "title": "长时运行 Agent：跨会话延续工作的 Harness",
+    "originalTitle": "Effective harnesses for long-running agents",
+    "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+    "canonicalUrl": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+    "publishedAt": "2025-11-26",
+    "sourceId": "source-anthropic-engineering",
+    "organizationId": "org-anthropic",
+    "authorName": "Anthropic Engineering",
+    "type": "article",
+    "layer": "engineering",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "这篇工程文章讨论如何让编码 Agent 在多个上下文窗口之间继续工作。初始化流程、任务记录、增量进展与端到端验证共同构成外部 Harness，帮助后续会话恢复任务状态。",
+    "takeaways": [
+      "持久化的进度记录比依赖对话历史更适合跨会话恢复。",
+      "一次只处理可验证的增量任务。",
+      "运行验证与提交记录为后续会话提供可检查证据。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "architecture",
+      "agent-harness",
+      "context-engineering",
+      "long-running-agents",
+      "persistent-state",
+      "coding-agent"
+    ],
+    "engineeringCase": {
+      "problem": "跨上下文窗口执行长任务时容易丢失进度或误判完成。",
+      "architecture": "初始化 Agent、编码 Agent、持久任务列表与验证环境。",
+      "solution": "用可恢复的进度文件、增量工作和端到端检查约束执行。",
+      "outcome": "文章报告其工程经验；不是对所有长时任务的通用完成保证。"
+    }
+  },
+  {
+    "id": "article-openai-agent-tools",
+    "slug": "openai-agent-tools",
+    "title": "OpenAI：构建 Agent 的工具与 SDK",
+    "originalTitle": "New tools for building agents",
+    "url": "https://openai.com/index/new-tools-for-building-agents/",
+    "canonicalUrl": "https://openai.com/index/new-tools-for-building-agents/",
+    "publishedAt": "2025-03-11",
+    "sourceId": "source-openai",
+    "organizationId": "org-openai",
+    "authorName": "OpenAI",
+    "type": "article",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "官方发布介绍 Responses API、内置工具与 Agents SDK。读者可以将工具执行、编排和追踪分开理解，再根据自身产品的权限、成本和评测要求决定集成方式。",
+    "takeaways": [
+      "API 工具与 Agent 编排层承担不同职责。",
+      "追踪有助于理解执行过程，但仍需任务级评测。",
+      "产品能力和计费应以当前官方文档为准。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "tool-use",
+      "function-calling",
+      "engineering",
+      "observability",
+      "multi-agent"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-openai-agents-sdk",
+    "slug": "openai-agents-sdk",
+    "title": "OpenAI Agents SDK：编排、交接与追踪的开源实现",
+    "originalTitle": "OpenAI Agents SDK",
+    "url": "https://github.com/openai/openai-agents-python",
+    "canonicalUrl": "https://github.com/openai/openai-agents-python",
+    "publishedAt": "2025-03-11",
+    "sourceId": "source-github",
+    "organizationId": "org-openai",
+    "authorName": "OpenAI Contributors",
+    "type": "repository",
+    "layer": "engineering",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "Python Agents SDK 提供 Agent、handoff、guardrail 与 tracing 等构建模块。代码仓库适合与官方发布配合阅读，理解编排抽象及可替换的实现接口；项目持续变化，应固定版本再评测。",
+    "takeaways": [
+      "使用开源实现查看抽象边界和执行路径。",
+      "交接与工具调用的适用场景不同。",
+      "生产部署需审视数据流、权限和异常处理。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "engineering",
+      "multi-agent",
+      "observability",
+      "human-in-the-loop"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-autogen",
+    "slug": "autogen",
+    "title": "AutoGen：以多 Agent 对话组织任务",
+    "originalTitle": "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation",
+    "url": "https://arxiv.org/abs/2308.08155",
+    "canonicalUrl": "https://arxiv.org/abs/2308.08155",
+    "publishedAt": "2023-08-16",
+    "sourceId": "source-arxiv",
+    "organizationId": "org-microsoft",
+    "authorName": "Qingyun Wu 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "AutoGen 提出可配置、可对话的 Agent 组件，让模型、工具和人类参与协作。论文中的多 Agent 模式是一种组织手段，是否优于单 Agent 仍应通过任务成功率与资源成本验证。",
+    "takeaways": [
+      "对话可以协调不同能力或角色的执行单元。",
+      "人类输入与工具执行可进入同一协作流程。",
+      "增加 Agent 数量不自动等于提高可靠性。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "architecture",
+      "multi-agent",
+      "human-in-the-loop"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-rag-paper",
+    "slug": "rag-paper",
+    "title": "RAG：把参数记忆与检索文档结合",
+    "originalTitle": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+    "url": "https://arxiv.org/abs/2005.11401",
+    "canonicalUrl": "https://arxiv.org/abs/2005.11401",
+    "publishedAt": "2020-05-22",
+    "sourceId": "source-arxiv",
+    "organizationId": "org-meta",
+    "authorName": "Patrick Lewis 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "RAG 将参数化生成模型与非参数化文档检索结合，用于知识密集型 NLP 任务。对于 Agent 开发，原始论文有助于区分检索、证据使用和生成三个层面的错误来源。",
+    "takeaways": [
+      "外部文档提供可更新的非参数化知识来源。",
+      "检索质量与生成质量需要分别检查。",
+      "本文不是 Agent 框架，而是相关技术基础。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "context-engineering",
+      "rag",
+      "memory-retrieval"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-chain-of-thought",
+    "slug": "chain-of-thought",
+    "title": "思维链提示：引导中间推理步骤",
+    "originalTitle": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+    "url": "https://arxiv.org/abs/2201.11903",
+    "canonicalUrl": "https://arxiv.org/abs/2201.11903",
+    "publishedAt": "2022-01-28",
+    "sourceId": "source-arxiv",
+    "organizationId": "org-google-research",
+    "authorName": "Jason Wei 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "论文研究在提示中给出中间推理示例对特定推理任务的影响。它是理解后续推理与行动结合工作的阅读起点，但不能据此把模型输出的推理文本视为内部计算过程的忠实记录。",
+    "takeaways": [
+      "在示例中提供中间步骤可改变部分任务的表现。",
+      "论文结果依赖模型规模和任务设置。",
+      "推理文本可供检查，但并不是正确性的保证。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "architecture",
+      "planning",
+      "prompt-engineering"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-llm-as-judge",
+    "slug": "llm-as-judge",
+    "title": "LLM-as-a-Judge：读懂模型裁判的偏差",
+    "originalTitle": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+    "url": "https://arxiv.org/abs/2306.05685",
+    "canonicalUrl": "https://arxiv.org/abs/2306.05685",
+    "publishedAt": "2023-06-09",
+    "sourceId": "source-arxiv",
+    "organizationId": "org-berkeley",
+    "authorName": "Lianmin Zheng 等",
+    "type": "paper",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "论文研究用强语言模型评价对话质量，并分析位置、冗长和自我偏好等偏差。对 Agent 评测而言，模型裁判可以补充无法直接执行检查的维度，但不能替代有客观判据的任务验证。",
+    "takeaways": [
+      "裁判提示、顺序和模型版本会影响结果。",
+      "应使用人类标注校准评价过程。",
+      "对可执行检查优先保留客观验证。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "evaluation",
+      "llm-as-judge",
+      "agent-evals"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-hello-agents",
+    "slug": "hello-agents",
+    "title": "Hello-Agents：中文智能体开发学习路线",
+    "originalTitle": "Hello-Agents：从零开始构建智能体",
+    "url": "https://github.com/datawhalechina/hello-agents",
+    "canonicalUrl": "https://github.com/datawhalechina/hello-agents",
+    "publishedAt": null,
+    "sourceId": "source-datawhale",
+    "organizationId": "org-datawhale",
+    "authorName": "Datawhale 社区",
+    "type": "repository",
+    "layer": "community",
+    "language": "zh",
+    "quality": "curated",
+    "status": "published",
+    "summary": "Datawhale 社区维护的中文 Agent 学习项目。适合把概念、代码练习与原始论文对照阅读；社区教程的实现选择不应直接解释为行业统一标准。",
+    "takeaways": [
+      "以仓库当前章节和运行说明为准。",
+      "把教程练习与自己的任务评测结合。",
+      "遇到争议结论时追溯教程引用的原始资料。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "architecture",
+      "agent-loop",
+      "tool-use",
+      "memory"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-llm-universe",
+    "slug": "llm-universe",
+    "title": "动手学大模型应用开发：中文社区实践",
+    "originalTitle": "动手学大模型应用开发",
+    "url": "https://github.com/datawhalechina/llm-universe",
+    "canonicalUrl": "https://github.com/datawhalechina/llm-universe",
+    "publishedAt": null,
+    "sourceId": "source-datawhale",
+    "organizationId": "org-datawhale",
+    "authorName": "Datawhale 社区",
+    "type": "repository",
+    "layer": "community",
+    "language": "zh",
+    "quality": "curated",
+    "status": "published",
+    "summary": "中文开源学习项目围绕大模型应用开发组织实践资料，包含检索增强等常见应用环节。作为学习资源入口，推荐结合锁定的依赖版本和原始文档使用。",
+    "takeaways": [
+      "社区案例帮助理解端到端应用路径。",
+      "检索和生成应分别设计验证方式。",
+      "示例结果不构成生产效果承诺。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "context-engineering",
+      "rag",
+      "applications",
+      "enterprise-agent"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-dify",
+    "slug": "dify",
+    "title": "Dify：查看开源 LLM 应用平台的工程实现",
+    "originalTitle": "Dify: Production-ready platform for agentic workflow development",
+    "url": "https://github.com/langgenius/dify",
+    "canonicalUrl": "https://github.com/langgenius/dify",
+    "publishedAt": null,
+    "sourceId": "source-dify",
+    "organizationId": "org-langgenius",
+    "authorName": "Dify Contributors",
+    "type": "repository",
+    "layer": "engineering",
+    "language": "zh",
+    "quality": "curated",
+    "status": "published",
+    "summary": "Dify 的开源仓库提供工作流、Agent 与知识检索等应用能力。通过部署文档和代码可以观察模型接入、数据管理和执行编排的边界；本导读不声称其在特定企业中的实际业务收益。",
+    "takeaways": [
+      "把编排层、模型提供者与数据层分开理解。",
+      "自托管时需要独立评估密钥、存储和网络边界。",
+      "应依据项目许可证区分代码使用与商用条件。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "engineering",
+      "workflow-vs-agent",
+      "rag",
+      "enterprise-agent"
+    ],
+    "engineeringCase": {
+      "problem": "LLM 应用开发涉及多种模型、检索和编排能力。",
+      "architecture": "开源应用平台提供工作流、Agent、模型接入和知识库。",
+      "solution": "通过可配置组件组织应用，代码和部署说明可公开核对。",
+      "outcome": "提供可运行的工程实现；这里未测量性能或商业效果。"
+    }
+  },
+  {
+    "id": "article-langgraph",
+    "slug": "langgraph",
+    "title": "LangGraph：持久执行与人在回路",
+    "originalTitle": "LangGraph",
+    "url": "https://github.com/langchain-ai/langgraph",
+    "canonicalUrl": "https://github.com/langchain-ai/langgraph",
+    "publishedAt": null,
+    "sourceId": "source-github",
+    "organizationId": null,
+    "authorName": "LangChain Contributors",
+    "type": "repository",
+    "layer": "engineering",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "LangGraph 是用于构建有状态 Agent 工作流的开源框架。仓库和文档适合用于研究状态持久化、恢复与人工介入的实现方式，选型时应与简单编排方案对比维护成本。",
+    "takeaways": [
+      "状态存储和执行图是框架的重要抽象。",
+      "持久化有助于恢复，但外部副作用仍需幂等设计。",
+      "人工介入应有明确的暂停点和审计记录。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "engineering",
+      "state-management",
+      "persistent-state",
+      "human-in-the-loop"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-gemini-long-context",
+    "slug": "gemini-long-context",
+    "title": "Gemini 1.5：长上下文模型的官方发布",
+    "originalTitle": "Our next-generation model: Gemini 1.5",
+    "url": "https://deepmind.google/discover/blog/gemini-15-our-next-generation-model-now-with-a-1-million-token-context-window/",
+    "canonicalUrl": "https://deepmind.google/discover/blog/gemini-15-our-next-generation-model-now-with-a-1-million-token-context-window/",
+    "publishedAt": "2024-02-15",
+    "sourceId": "source-deepmind",
+    "organizationId": "org-google-deepmind",
+    "authorName": "Google DeepMind",
+    "type": "article",
+    "layer": "primary",
+    "language": "en",
+    "quality": "curated",
+    "status": "published",
+    "summary": "Gemini 1.5 的发布介绍更长上下文窗口与多模态能力。长窗口拓展了可输入的信息量，但 Agent 系统仍需评估检索、延迟、成本以及信息使用的准确性。",
+    "takeaways": [
+      "上下文窗口长度是容量指标，不是任务成功率。",
+      "长输入依然需要组织和验证相关证据。",
+      "发布时的能力描述应与实际使用版本区分。"
+    ],
+    "audience": "Agent 开发者、技术架构师",
+    "topics": [
+      "context-engineering",
+      "context-window"
+    ],
+    "engineeringCase": null
+  },
+  {
+    "id": "article-agentscope",
+    "slug": "agentscope",
+    "title": "AgentScope：可观察的多 Agent 工程框架",
+    "originalTitle": "AgentScope: Build and run agents you can see, understand and trust",
+    "url": "https://github.com/agentscope-ai/agentscope",
+    "canonicalUrl": "https://github.com/agentscope-ai/agentscope",
+    "publishedAt": null,
+    "sourceId": "source-agentscope",
+    "organizationId": "org-alibaba",
+    "authorName": "AgentScope Contributors",
+    "type": "repository",
+    "layer": "engineering",
+    "language": "zh",
+    "quality": "curated",
+    "status": "published",
+    "summary": "AgentScope 的公开仓库围绕 Agent 构建、工具与运行过程提供工程实现。可以结合 README 和示例理解多 Agent 协作、状态与观察能力；本文仅导读公开代码，不把项目介绍当作经过本平台验证的生产收益。",
+    "takeaways": [
+      "通过公开示例观察模型、工具和执行组件的边界。",
+      "多 Agent 编排应结合状态与消息管理一起理解。",
+      "部署能力和使用条件应以对应版本README与许可证为准。"
+    ],
+    "audience": "Agent 平台工程师、架构师与开源贡献者",
+    "topics": [
+      "engineering",
+      "multi-agent",
+      "observability",
+      "state-management"
+    ],
+    "engineeringCase": {
+      "problem": "Agent 系统需要可理解的构建方式与可观察的运行过程。",
+      "architecture": "框架组织模型、Agent、工具及多 Agent 交互组件。",
+      "solution": "通过开源组件与示例构建和观察 Agent 运行。",
+      "outcome": "代码和示例可核对；本平台未执行性能基准或测量业务收益。"
+    }
+  },
+  {
+    "id": "article-deer-flow",
+    "slug": "deer-flow",
+    "title": "DeerFlow：长任务 Agent Harness 的开源实践",
+    "originalTitle": "DeerFlow",
+    "url": "https://github.com/bytedance/deer-flow",
+    "canonicalUrl": "https://github.com/bytedance/deer-flow",
+    "publishedAt": null,
+    "sourceId": "source-deer-flow",
+    "organizationId": "org-bytedance",
+    "authorName": "ByteDance / DeerFlow Contributors",
+    "type": "repository",
+    "layer": "engineering",
+    "language": "zh",
+    "quality": "curated",
+    "status": "published",
+    "summary": "DeerFlow 公开介绍面向长任务的 Agent harness，并将沙箱、记忆、工具、技能和子 Agent 组合到执行环境中。阅读时可以对照长期运行 Agent 的工程文章，比较系统边界；主题相近不表示两者存在技术继承关系。",
+    "takeaways": [
+      "把执行环境与单次模型调用区分开。",
+      "沙箱、工具和子 Agent 需要各自的权限与生命周期。",
+      "仓库版本持续演进，复现时需固定版本和依赖。"
+    ],
+    "audience": "Agent 平台工程师、架构师与开源贡献者",
+    "topics": [
+      "engineering",
+      "agent-harness",
+      "sandboxing",
+      "skills",
+      "multi-agent",
+      "research-agent"
+    ],
+    "engineeringCase": {
+      "problem": "长任务往往同时需要工具执行、上下文管理与环境隔离。",
+      "architecture": "公开README描述的 harness 包括沙箱、记忆、工具、技能和子 Agent。",
+      "solution": "组合运行环境和可扩展能力支持长任务执行。",
+      "outcome": "提供公开可查看的工程实现；未声称已验证性能或生产指标。"
+    }
+  }
+]

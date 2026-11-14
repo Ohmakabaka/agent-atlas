@@ -1,0 +1,877 @@
+[
+  {
+    "id": "topic-architecture",
+    "slug": "architecture",
+    "name": "Agent 基础架构",
+    "englishName": "Agent Architecture",
+    "description": "先理解一个可观察的 Agent Loop，再比较确定性工作流与模型驱动的决策路径。本专题以 ReAct 论文、Anthropic 的模式总结和长时任务 Harness 为线索，区分研究方法、编排选择与工程执行环境；不把三者视为必然的单线技术继承。",
+    "question": "什么任务需要 Agent，什么任务适合确定性的工作流？",
+    "concepts": [
+      "Agent Loop",
+      "规划与推理",
+      "ReAct",
+      "Workflow vs Agent",
+      "多智能体协作",
+      "Agent Harness"
+    ],
+    "readingPath": [
+      "react",
+      "building-effective-agents",
+      "long-running-harness"
+    ],
+    "featured": true,
+    "sortOrder": 0,
+    "color": "teal",
+    "parentId": null
+  },
+  {
+    "id": "topic-agent-loop",
+    "slug": "agent-loop",
+    "name": "Agent Loop",
+    "englishName": "感知、决策、执行与反馈",
+    "description": "Agent 基础架构方向中的Agent Loop专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用Agent Loop，它有哪些适用边界？",
+    "concepts": [
+      "感知、决策、执行与反馈"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 0,
+    "color": "teal",
+    "parentId": "topic-architecture"
+  },
+  {
+    "id": "topic-planning",
+    "slug": "planning",
+    "name": "规划与推理",
+    "englishName": "Planning / Reasoning",
+    "description": "Agent 基础架构方向中的规划与推理专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用规划与推理，它有哪些适用边界？",
+    "concepts": [
+      "Planning / Reasoning"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 1,
+    "color": "teal",
+    "parentId": "topic-architecture"
+  },
+  {
+    "id": "topic-react",
+    "slug": "react",
+    "name": "ReAct",
+    "englishName": "推理与行动交替",
+    "description": "Agent 基础架构方向中的ReAct专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用ReAct，它有哪些适用边界？",
+    "concepts": [
+      "推理与行动交替"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 2,
+    "color": "teal",
+    "parentId": "topic-architecture"
+  },
+  {
+    "id": "topic-workflow-vs-agent",
+    "slug": "workflow-vs-agent",
+    "name": "Workflow vs Agent",
+    "englishName": "确定性编排与模型自主决策",
+    "description": "Agent 基础架构方向中的Workflow vs Agent专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用Workflow vs Agent，它有哪些适用边界？",
+    "concepts": [
+      "确定性编排与模型自主决策"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 3,
+    "color": "teal",
+    "parentId": "topic-architecture"
+  },
+  {
+    "id": "topic-multi-agent",
+    "slug": "multi-agent",
+    "name": "多智能体协作",
+    "englishName": "Single-Agent / Multi-Agent",
+    "description": "Agent 基础架构方向中的多智能体协作专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用多智能体协作，它有哪些适用边界？",
+    "concepts": [
+      "Single-Agent / Multi-Agent"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 4,
+    "color": "teal",
+    "parentId": "topic-architecture"
+  },
+  {
+    "id": "topic-agent-harness",
+    "slug": "agent-harness",
+    "name": "Agent Harness",
+    "englishName": "长期运行的执行环境",
+    "description": "Agent 基础架构方向中的Agent Harness专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用Agent Harness，它有哪些适用边界？",
+    "concepts": [
+      "长期运行的执行环境"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 5,
+    "color": "teal",
+    "parentId": "topic-architecture"
+  },
+  {
+    "id": "topic-context-engineering",
+    "slug": "context-engineering",
+    "name": "上下文工程",
+    "englishName": "Context Engineering",
+    "description": "上下文工程关心每次模型调用真正可见的信息：指令、工具说明、检索证据、历史与任务状态。从 RAG 的外部知识到 MemGPT 的分层管理，再阅读工程文章中的压缩和隔离策略，逐步建立可测量的上下文预算。",
+    "question": "如何让 Agent 在长任务中保持目标、证据与状态？",
+    "concepts": [
+      "上下文窗口管理",
+      "上下文压缩",
+      "长时运行 Agent",
+      "提示工程",
+      "检索增强生成",
+      "上下文隔离"
+    ],
+    "readingPath": [
+      "rag-paper",
+      "memgpt",
+      "context-engineering"
+    ],
+    "featured": true,
+    "sortOrder": 1,
+    "color": "blue",
+    "parentId": null
+  },
+  {
+    "id": "topic-context-window",
+    "slug": "context-window",
+    "name": "上下文窗口管理",
+    "englishName": "Context Window Management",
+    "description": "上下文工程方向中的上下文窗口管理专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用上下文窗口管理，它有哪些适用边界？",
+    "concepts": [
+      "Context Window Management"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 0,
+    "color": "blue",
+    "parentId": "topic-context-engineering"
+  },
+  {
+    "id": "topic-context-compression",
+    "slug": "context-compression",
+    "name": "上下文压缩",
+    "englishName": "Context Compression",
+    "description": "上下文工程方向中的上下文压缩专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用上下文压缩，它有哪些适用边界？",
+    "concepts": [
+      "Context Compression"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 1,
+    "color": "blue",
+    "parentId": "topic-context-engineering"
+  },
+  {
+    "id": "topic-long-running-agents",
+    "slug": "long-running-agents",
+    "name": "长时运行 Agent",
+    "englishName": "Long-running Agents",
+    "description": "上下文工程方向中的长时运行 Agent专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用长时运行 Agent，它有哪些适用边界？",
+    "concepts": [
+      "Long-running Agents"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 2,
+    "color": "blue",
+    "parentId": "topic-context-engineering"
+  },
+  {
+    "id": "topic-prompt-engineering",
+    "slug": "prompt-engineering",
+    "name": "提示工程",
+    "englishName": "Prompt Engineering",
+    "description": "上下文工程方向中的提示工程专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用提示工程，它有哪些适用边界？",
+    "concepts": [
+      "Prompt Engineering"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 3,
+    "color": "blue",
+    "parentId": "topic-context-engineering"
+  },
+  {
+    "id": "topic-rag",
+    "slug": "rag",
+    "name": "检索增强生成",
+    "englishName": "RAG",
+    "description": "上下文工程方向中的检索增强生成专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用检索增强生成，它有哪些适用边界？",
+    "concepts": [
+      "RAG"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 4,
+    "color": "blue",
+    "parentId": "topic-context-engineering"
+  },
+  {
+    "id": "topic-context-isolation",
+    "slug": "context-isolation",
+    "name": "上下文隔离",
+    "englishName": "Context Isolation",
+    "description": "上下文工程方向中的上下文隔离专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用上下文隔离，它有哪些适用边界？",
+    "concepts": [
+      "Context Isolation"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 5,
+    "color": "blue",
+    "parentId": "topic-context-engineering"
+  },
+  {
+    "id": "topic-memory",
+    "slug": "memory",
+    "name": "记忆系统",
+    "englishName": "Memory",
+    "description": "区分工作上下文、跨轮次记忆与持久状态，设计可检索的信息生命周期。",
+    "question": "哪些信息值得长期保存，又该何时遗忘？",
+    "concepts": [
+      "短期记忆",
+      "长期记忆",
+      "记忆检索",
+      "记忆整合",
+      "持久状态"
+    ],
+    "readingPath": [
+      "generative-agents",
+      "reflexion",
+      "memgpt"
+    ],
+    "featured": false,
+    "sortOrder": 2,
+    "color": "violet",
+    "parentId": null
+  },
+  {
+    "id": "topic-short-term-memory",
+    "slug": "short-term-memory",
+    "name": "短期记忆",
+    "englishName": "Short-term Memory",
+    "description": "记忆系统方向中的短期记忆专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用短期记忆，它有哪些适用边界？",
+    "concepts": [
+      "Short-term Memory"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 0,
+    "color": "violet",
+    "parentId": "topic-memory"
+  },
+  {
+    "id": "topic-long-term-memory",
+    "slug": "long-term-memory",
+    "name": "长期记忆",
+    "englishName": "Long-term Memory",
+    "description": "记忆系统方向中的长期记忆专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用长期记忆，它有哪些适用边界？",
+    "concepts": [
+      "Long-term Memory"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 1,
+    "color": "violet",
+    "parentId": "topic-memory"
+  },
+  {
+    "id": "topic-memory-retrieval",
+    "slug": "memory-retrieval",
+    "name": "记忆检索",
+    "englishName": "Memory Retrieval",
+    "description": "记忆系统方向中的记忆检索专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用记忆检索，它有哪些适用边界？",
+    "concepts": [
+      "Memory Retrieval"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 2,
+    "color": "violet",
+    "parentId": "topic-memory"
+  },
+  {
+    "id": "topic-memory-consolidation",
+    "slug": "memory-consolidation",
+    "name": "记忆整合",
+    "englishName": "Memory Consolidation",
+    "description": "记忆系统方向中的记忆整合专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用记忆整合，它有哪些适用边界？",
+    "concepts": [
+      "Memory Consolidation"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 3,
+    "color": "violet",
+    "parentId": "topic-memory"
+  },
+  {
+    "id": "topic-persistent-state",
+    "slug": "persistent-state",
+    "name": "持久状态",
+    "englishName": "Persistent State",
+    "description": "记忆系统方向中的持久状态专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用持久状态，它有哪些适用边界？",
+    "concepts": [
+      "Persistent State"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 4,
+    "color": "violet",
+    "parentId": "topic-memory"
+  },
+  {
+    "id": "topic-tool-use",
+    "slug": "tool-use",
+    "name": "工具使用",
+    "englishName": "Tool Use",
+    "description": "连接模型决策与真实执行，关注协议、权限和失败恢复。",
+    "question": "怎样让模型安全、可靠地调用合适的工具？",
+    "concepts": [
+      "函数调用",
+      "模型上下文协议",
+      "工具发现",
+      "工具选择",
+      "工具权限",
+      "工具执行与恢复"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 3,
+    "color": "amber",
+    "parentId": null
+  },
+  {
+    "id": "topic-function-calling",
+    "slug": "function-calling",
+    "name": "函数调用",
+    "englishName": "Function Calling",
+    "description": "工具使用方向中的函数调用专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用函数调用，它有哪些适用边界？",
+    "concepts": [
+      "Function Calling"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 0,
+    "color": "amber",
+    "parentId": "topic-tool-use"
+  },
+  {
+    "id": "topic-mcp",
+    "slug": "mcp",
+    "name": "模型上下文协议",
+    "englishName": "MCP",
+    "description": "工具使用方向中的模型上下文协议专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用模型上下文协议，它有哪些适用边界？",
+    "concepts": [
+      "MCP"
+    ],
+    "readingPath": [
+      "mcp-announcement",
+      "mcp-spec"
+    ],
+    "featured": false,
+    "sortOrder": 1,
+    "color": "amber",
+    "parentId": "topic-tool-use"
+  },
+  {
+    "id": "topic-tool-discovery",
+    "slug": "tool-discovery",
+    "name": "工具发现",
+    "englishName": "Tool Discovery",
+    "description": "工具使用方向中的工具发现专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用工具发现，它有哪些适用边界？",
+    "concepts": [
+      "Tool Discovery"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 2,
+    "color": "amber",
+    "parentId": "topic-tool-use"
+  },
+  {
+    "id": "topic-tool-selection",
+    "slug": "tool-selection",
+    "name": "工具选择",
+    "englishName": "Tool Selection",
+    "description": "工具使用方向中的工具选择专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用工具选择，它有哪些适用边界？",
+    "concepts": [
+      "Tool Selection"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 3,
+    "color": "amber",
+    "parentId": "topic-tool-use"
+  },
+  {
+    "id": "topic-tool-permissions",
+    "slug": "tool-permissions",
+    "name": "工具权限",
+    "englishName": "Tool Permissions",
+    "description": "工具使用方向中的工具权限专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用工具权限，它有哪些适用边界？",
+    "concepts": [
+      "Tool Permissions"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 4,
+    "color": "amber",
+    "parentId": "topic-tool-use"
+  },
+  {
+    "id": "topic-tool-recovery",
+    "slug": "tool-recovery",
+    "name": "工具执行与恢复",
+    "englishName": "Tool Execution and Recovery",
+    "description": "工具使用方向中的工具执行与恢复专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用工具执行与恢复，它有哪些适用边界？",
+    "concepts": [
+      "Tool Execution and Recovery"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 5,
+    "color": "amber",
+    "parentId": "topic-tool-use"
+  },
+  {
+    "id": "topic-engineering",
+    "slug": "engineering",
+    "name": "Agent 工程",
+    "englishName": "Agent Engineering",
+    "description": "从演示走向可维护的系统：状态、隔离、可观测性与人机协作。",
+    "question": "如何把一次成功的演示变成可以持续运行的服务？",
+    "concepts": [
+      "沙箱隔离",
+      "代码执行",
+      "浏览器自动化",
+      "技能模块",
+      "状态管理",
+      "可观测性",
+      "可靠性",
+      "人在回路"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 4,
+    "color": "rose",
+    "parentId": null
+  },
+  {
+    "id": "topic-sandboxing",
+    "slug": "sandboxing",
+    "name": "沙箱隔离",
+    "englishName": "Sandboxing",
+    "description": "Agent 工程方向中的沙箱隔离专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用沙箱隔离，它有哪些适用边界？",
+    "concepts": [
+      "Sandboxing"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 0,
+    "color": "rose",
+    "parentId": "topic-engineering"
+  },
+  {
+    "id": "topic-code-execution",
+    "slug": "code-execution",
+    "name": "代码执行",
+    "englishName": "Code Execution",
+    "description": "Agent 工程方向中的代码执行专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用代码执行，它有哪些适用边界？",
+    "concepts": [
+      "Code Execution"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 1,
+    "color": "rose",
+    "parentId": "topic-engineering"
+  },
+  {
+    "id": "topic-browser-automation",
+    "slug": "browser-automation",
+    "name": "浏览器自动化",
+    "englishName": "Browser Automation",
+    "description": "Agent 工程方向中的浏览器自动化专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用浏览器自动化，它有哪些适用边界？",
+    "concepts": [
+      "Browser Automation"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 2,
+    "color": "rose",
+    "parentId": "topic-engineering"
+  },
+  {
+    "id": "topic-skills",
+    "slug": "skills",
+    "name": "技能模块",
+    "englishName": "Skills",
+    "description": "Agent 工程方向中的技能模块专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用技能模块，它有哪些适用边界？",
+    "concepts": [
+      "Skills"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 3,
+    "color": "rose",
+    "parentId": "topic-engineering"
+  },
+  {
+    "id": "topic-state-management",
+    "slug": "state-management",
+    "name": "状态管理",
+    "englishName": "State Management",
+    "description": "Agent 工程方向中的状态管理专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用状态管理，它有哪些适用边界？",
+    "concepts": [
+      "State Management"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 4,
+    "color": "rose",
+    "parentId": "topic-engineering"
+  },
+  {
+    "id": "topic-observability",
+    "slug": "observability",
+    "name": "可观测性",
+    "englishName": "Observability",
+    "description": "Agent 工程方向中的可观测性专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用可观测性，它有哪些适用边界？",
+    "concepts": [
+      "Observability"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 5,
+    "color": "rose",
+    "parentId": "topic-engineering"
+  },
+  {
+    "id": "topic-reliability",
+    "slug": "reliability",
+    "name": "可靠性",
+    "englishName": "Reliability",
+    "description": "Agent 工程方向中的可靠性专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用可靠性，它有哪些适用边界？",
+    "concepts": [
+      "Reliability"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 6,
+    "color": "rose",
+    "parentId": "topic-engineering"
+  },
+  {
+    "id": "topic-human-in-the-loop",
+    "slug": "human-in-the-loop",
+    "name": "人在回路",
+    "englishName": "Human-in-the-loop",
+    "description": "Agent 工程方向中的人在回路专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用人在回路，它有哪些适用边界？",
+    "concepts": [
+      "Human-in-the-loop"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 7,
+    "color": "rose",
+    "parentId": "topic-engineering"
+  },
+  {
+    "id": "topic-evaluation",
+    "slug": "evaluation",
+    "name": "Agent 评测",
+    "englishName": "Evaluation",
+    "description": "评测从清晰的任务定义和判定规则开始。SWE-bench、WebArena 与 OSWorld 提供不同执行环境的参照；模型裁判论文帮助理解主观评价的偏差。推荐同时记录任务结果、轨迹和成本，并明确基准结论的适用范围。",
+    "question": "怎么知道 Agent 真的完成了任务，而不只是给出好看的回答？",
+    "concepts": [
+      "Agent 评测方法",
+      "轨迹评测",
+      "基准测试",
+      "任务成功率",
+      "回归测试",
+      "模型裁判",
+      "生产环境评测"
+    ],
+    "readingPath": [
+      "swe-bench",
+      "webarena",
+      "llm-as-judge"
+    ],
+    "featured": true,
+    "sortOrder": 5,
+    "color": "cyan",
+    "parentId": null
+  },
+  {
+    "id": "topic-agent-evals",
+    "slug": "agent-evals",
+    "name": "Agent 评测方法",
+    "englishName": "Agent Evals",
+    "description": "Agent 评测方向中的Agent 评测方法专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用Agent 评测方法，它有哪些适用边界？",
+    "concepts": [
+      "Agent Evals"
+    ],
+    "readingPath": [
+      "swe-bench",
+      "llm-as-judge"
+    ],
+    "featured": false,
+    "sortOrder": 0,
+    "color": "cyan",
+    "parentId": "topic-evaluation"
+  },
+  {
+    "id": "topic-trajectory-evaluation",
+    "slug": "trajectory-evaluation",
+    "name": "轨迹评测",
+    "englishName": "Trajectory Evaluation",
+    "description": "Agent 评测方向中的轨迹评测专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用轨迹评测，它有哪些适用边界？",
+    "concepts": [
+      "Trajectory Evaluation"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 1,
+    "color": "cyan",
+    "parentId": "topic-evaluation"
+  },
+  {
+    "id": "topic-benchmarks",
+    "slug": "benchmarks",
+    "name": "基准测试",
+    "englishName": "Benchmark",
+    "description": "Agent 评测方向中的基准测试专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用基准测试，它有哪些适用边界？",
+    "concepts": [
+      "Benchmark"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 2,
+    "color": "cyan",
+    "parentId": "topic-evaluation"
+  },
+  {
+    "id": "topic-task-success-rate",
+    "slug": "task-success-rate",
+    "name": "任务成功率",
+    "englishName": "Task Success Rate",
+    "description": "Agent 评测方向中的任务成功率专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用任务成功率，它有哪些适用边界？",
+    "concepts": [
+      "Task Success Rate"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 3,
+    "color": "cyan",
+    "parentId": "topic-evaluation"
+  },
+  {
+    "id": "topic-regression-testing",
+    "slug": "regression-testing",
+    "name": "回归测试",
+    "englishName": "Regression Testing",
+    "description": "Agent 评测方向中的回归测试专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用回归测试，它有哪些适用边界？",
+    "concepts": [
+      "Regression Testing"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 4,
+    "color": "cyan",
+    "parentId": "topic-evaluation"
+  },
+  {
+    "id": "topic-llm-as-judge",
+    "slug": "llm-as-judge",
+    "name": "模型裁判",
+    "englishName": "LLM-as-a-Judge",
+    "description": "Agent 评测方向中的模型裁判专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用模型裁判，它有哪些适用边界？",
+    "concepts": [
+      "LLM-as-a-Judge"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 5,
+    "color": "cyan",
+    "parentId": "topic-evaluation"
+  },
+  {
+    "id": "topic-production-evaluation",
+    "slug": "production-evaluation",
+    "name": "生产环境评测",
+    "englishName": "Production Evaluation",
+    "description": "Agent 评测方向中的生产环境评测专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用生产环境评测，它有哪些适用边界？",
+    "concepts": [
+      "Production Evaluation"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 6,
+    "color": "cyan",
+    "parentId": "topic-evaluation"
+  },
+  {
+    "id": "topic-applications",
+    "slug": "applications",
+    "name": "应用场景",
+    "englishName": "Applications",
+    "description": "在具体任务、数据和环境约束下选择 Agent 的形态。",
+    "question": "不同场景对自主性、工具与人工监督有哪些不同要求？",
+    "concepts": [
+      "编程 Agent",
+      "研究 Agent",
+      "数据分析 Agent",
+      "浏览器 Agent",
+      "企业 Agent",
+      "客服 Agent"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 6,
+    "color": "green",
+    "parentId": null
+  },
+  {
+    "id": "topic-coding-agent",
+    "slug": "coding-agent",
+    "name": "编程 Agent",
+    "englishName": "Coding Agent",
+    "description": "应用场景方向中的编程 Agent专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用编程 Agent，它有哪些适用边界？",
+    "concepts": [
+      "Coding Agent"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 0,
+    "color": "green",
+    "parentId": "topic-applications"
+  },
+  {
+    "id": "topic-research-agent",
+    "slug": "research-agent",
+    "name": "研究 Agent",
+    "englishName": "Research Agent",
+    "description": "应用场景方向中的研究 Agent专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用研究 Agent，它有哪些适用边界？",
+    "concepts": [
+      "Research Agent"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 1,
+    "color": "green",
+    "parentId": "topic-applications"
+  },
+  {
+    "id": "topic-data-analysis-agent",
+    "slug": "data-analysis-agent",
+    "name": "数据分析 Agent",
+    "englishName": "Data Analysis Agent",
+    "description": "应用场景方向中的数据分析 Agent专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用数据分析 Agent，它有哪些适用边界？",
+    "concepts": [
+      "Data Analysis Agent"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 2,
+    "color": "green",
+    "parentId": "topic-applications"
+  },
+  {
+    "id": "topic-browser-agent",
+    "slug": "browser-agent",
+    "name": "浏览器 Agent",
+    "englishName": "Browser Agent",
+    "description": "应用场景方向中的浏览器 Agent专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用浏览器 Agent，它有哪些适用边界？",
+    "concepts": [
+      "Browser Agent"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 3,
+    "color": "green",
+    "parentId": "topic-applications"
+  },
+  {
+    "id": "topic-enterprise-agent",
+    "slug": "enterprise-agent",
+    "name": "企业 Agent",
+    "englishName": "Enterprise Agent",
+    "description": "应用场景方向中的企业 Agent专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用企业 Agent，它有哪些适用边界？",
+    "concepts": [
+      "Enterprise Agent"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 4,
+    "color": "green",
+    "parentId": "topic-applications"
+  },
+  {
+    "id": "topic-customer-support-agent",
+    "slug": "customer-support-agent",
+    "name": "客服 Agent",
+    "englishName": "Customer Support Agent",
+    "description": "应用场景方向中的客服 Agent专题。结合原始资料与实现阅读，区分论文设定、工程约束和未经验证的经验。",
+    "question": "如何理解和应用客服 Agent，它有哪些适用边界？",
+    "concepts": [
+      "Customer Support Agent"
+    ],
+    "readingPath": [],
+    "featured": false,
+    "sortOrder": 5,
+    "color": "green",
+    "parentId": "topic-applications"
+  }
+]
