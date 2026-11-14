@@ -1,23 +1,28 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { authConfigured, isAuthenticated } from "@/lib/auth";
+import { authConfigured, isAuthenticated, loginFormToken } from "@/lib/auth";
 import { login } from "./actions";
+import { LoginSubmit } from "./submit-button";
 export default async function Login({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; retry?: string }>;
 }) {
   if (await isAuthenticated()) redirect("/admin");
-  const { error } = await searchParams;
+  const { error, retry } = await searchParams;
   const configured = authConfigured();
+  const clientToken = configured ? await loginFormToken() : "";
+  const seconds = Math.min(600, Math.max(1, Number(retry) || 600));
   const message =
     error === "rate"
-      ? "尝试次数过多，请十分钟后再试。"
+      ? `尝试次数过多，请约 ${Math.ceil(seconds / 60)} 分钟后再试。`
       : error === "invalid"
         ? "编辑口令不正确，请重试。"
-        : error === "config"
-          ? "尚未配置编辑口令和会话密钥。"
-          : "";
+        : error === "unavailable"
+          ? "暂时无法验证登录，请稍后重试。"
+          : error === "config"
+            ? "尚未配置编辑口令和会话密钥。"
+            : "";
   return (
     <main
       className="page-shell"
@@ -45,6 +50,7 @@ export default async function Login({
           action={login}
           style={{ display: "grid", gap: 16, marginTop: 24 }}
         >
+          <input type="hidden" name="clientToken" value={clientToken} />
           <label className="field">
             编辑口令
             <input
@@ -57,9 +63,7 @@ export default async function Login({
               disabled={!configured}
             />
           </label>
-          <button className="button" disabled={!configured}>
-            进入工作台
-          </button>
+          <LoginSubmit disabled={!configured} />
         </form>
         <p className="muted" style={{ fontSize: 12, marginTop: 20 }}>
           仅供受信任的小团队编辑使用。会话有效期为 12 小时。

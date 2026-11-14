@@ -61,3 +61,6 @@ P0闭环已完成，可从主题探索进入资料，或在后台收录、修订
 | 持久鉴权、备份恢复、容器部署 | 开发中 | — | — |
 
 本轮新增数据库迁移提供Article.version、ArticleRevision、AuditLog、RateLimit、SyncLease和来源同步状态，保留旧内容。
+
+- `91d9777`：成品化基础迁移与相关度搜索已推送。
+- 本提交 `feat: persist isolated editor rate limits and authentication audit`：按客户端与全局上限持久限流、代理信任边界、登录审计与密码轮换撤销会话；8项认证/SQLite测试通过。
