@@ -160,7 +160,7 @@ export default async function Explore({
           </form>
           <p className="results-count">
             找到 <strong style={{ color: "var(--ink)" }}>{r.total}</strong>{" "}
-            条已审核资料 {p.q && <> · “{p.q}”</>}
+            条已发布内容 {p.q && <> · “{p.q}”</>}
             <span style={{ float: "right" }}>{searchSorts[r.sort]}</span>
           </p>
           {r.articles.length ? (

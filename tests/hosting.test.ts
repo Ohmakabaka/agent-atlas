@@ -9,7 +9,8 @@ test("Render's runtime origin enables canonical URLs and an explicit custom doma
   };
   try {
     delete process.env.SITE_URL;
-    process.env.RENDER_EXTERNAL_URL = "https://agent-atlas-example.onrender.com";
+    process.env.RENDER_EXTERNAL_URL =
+      "https://agent-atlas-example.onrender.com";
     assert.equal(siteOrigin(), process.env.RENDER_EXTERNAL_URL);
     assert.equal(
       canonicalPath("articles", "react"),

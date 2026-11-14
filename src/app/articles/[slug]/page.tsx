@@ -9,6 +9,7 @@ import Markdown from "react-markdown";
 import { getArticle } from "@/lib/queries";
 import { date, layers, types, strings } from "@/lib/labels";
 import { ArticleCard } from "@/components/article-card";
+import { editorialProvenance } from "@/lib/editorial/schema";
 export const dynamic = "force-dynamic";
 const loadArticle = cache(getArticle);
 export async function generateMetadata({
@@ -29,6 +30,7 @@ export default async function ArticlePage({
   const { slug } = await params;
   const a = await loadArticle(slug);
   if (!a) notFound();
+  const editorial = editorialProvenance(a.rawMetadata);
   return (
     <main className="page-shell">
       <script
@@ -44,12 +46,14 @@ export default async function ArticlePage({
         <div className="article-meta">
           <span className={`layer ${a.layer}`}>{layers[a.layer]}</span>
           <span>{types[a.type]}</span>
-          <span>已审核</span>
+          <span>{editorial ? "Codex 辅助创作" : "已审核"}</span>
         </div>
         <h1 style={{ maxWidth: 930 }}>{a.title}</h1>
-        <p className="subtitle" lang="en">
-          {a.originalTitle}
-        </p>
+        {a.originalTitle !== a.title && (
+          <p className="subtitle" lang={a.language === "zh" ? "zh" : "en"}>
+            {a.originalTitle}
+          </p>
+        )}
         <div className="tags" style={{ marginTop: 18 }}>
           {a.topics.map(({ topic: t }) => (
             <Link key={t.id} href={`/topics/${t.slug}`}>
@@ -63,12 +67,16 @@ export default async function ArticlePage({
         <div>
           <section className="panel">
             <span className="eyebrow">EDITORIAL GUIDE</span>
-            <h2 style={{ marginTop: 10 }}>中文导读</h2>
+            <h2 style={{ marginTop: 10 }}>
+              {editorial ? "阅读导引" : "中文导读"}
+            </h2>
             <div className="prose">
               <Markdown>{a.summary}</Markdown>
             </div>
             <div className="notice">
-              这是独立撰写的中文导读，不是原文全文翻译。具体技术表述、实验设置及结论，请以原始资料为准。
+              {editorial
+                ? `本站原创指南由 Codex 辅助创作，参考资料核查于 ${editorial.verifiedAt}。${a.reviewedAt ? "编辑已复核。" : "尚未经过人工复核。"} 文中的工程建议与原始资料描述分别标明。`
+                : "这是独立撰写的中文导读，不是原文全文翻译。具体技术表述、实验设置及结论，请以原始资料为准。"}
             </div>
             <a
               className="button"
@@ -76,9 +84,17 @@ export default async function ArticlePage({
               target="_blank"
               rel="noopener noreferrer"
             >
-              阅读原始资料 ↗
+              {editorial ? "查看 GitHub 内容存档 ↗" : "阅读原始资料 ↗"}
             </a>
           </section>
+          {a.bodyMarkdown && (
+            <section className="panel" aria-label="原创指南正文">
+              <span className="eyebrow">PRACTICAL GUIDE</span>
+              <div className="prose">
+                <Markdown>{a.bodyMarkdown}</Markdown>
+              </div>
+            </section>
+          )}
           <section className="panel">
             <h2>技术要点</h2>
             <ul className="prose" style={{ paddingLeft: 20 }}>
@@ -168,10 +184,36 @@ export default async function ArticlePage({
               </div>
               <div>
                 <dt>审核</dt>
-                <dd>{date(a.reviewedAt)}</dd>
+                <dd>
+                  {editorial && !a.reviewedAt
+                    ? "尚未人工复核"
+                    : date(a.reviewedAt)}
+                </dd>
               </div>
             </dl>
           </div>
+          {editorial && (
+            <div className="panel">
+              <h3>核查资料</h3>
+              <p className="muted" style={{ fontSize: 12 }}>
+                核查日期：{editorial.verifiedAt}。工程示例为本站教学设计。
+              </p>
+              {editorial.references.map((reference) => (
+                <a
+                  className="reading-step"
+                  href={reference.url}
+                  key={reference.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div>
+                    <strong>{reference.title} ↗</strong>
+                    <p>{reference.locator}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
           <div className="panel">
             <h3>内容关系</h3>
             {[
@@ -204,9 +246,7 @@ export default async function ArticlePage({
                   </Link>
                 )}
                 {r.topic && (
-                  <Link href={`/topics/${r.topic.slug}`}>
-                    {r.topic.name} ↗
-                  </Link>
+                  <Link href={`/topics/${r.topic.slug}`}>{r.topic.name} ↗</Link>
                 )}
                 <p className="muted" style={{ fontSize: 11, marginTop: 6 }}>
                   {r.description}

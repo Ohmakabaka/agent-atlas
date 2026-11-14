@@ -59,6 +59,7 @@ async function fixture(suffix: string) {
       url: `https://example.org/${suffix}`,
       canonicalUrl: `https://example.org/${suffix}`,
       summary: "这是经过原始资料核对的中文技术导读，说明工程问题、方法与局限。",
+      bodyMarkdown: "## 初始原创正文\n\n此处是用于验证版本恢复的原创正文。",
       audience: "工程师",
       type: "article",
       layer: "engineering",
@@ -96,6 +97,7 @@ test("editor saves immutable snapshots and restores reviewed fields as a new pen
     ...initial,
     title: "经过修改的工程标题",
     summary: "这是新的中文导读，补充原始内容没有说明的工程局限和假设条件。",
+    bodyMarkdown: "## 新版原创正文\n\n正文修改需要随历史版本一起保存与恢复。",
     engineeringCase: null,
     personIds: [],
   };
@@ -106,6 +108,10 @@ test("editor saves immutable snapshots and restores reviewed fields as a new pen
   });
   assert.equal((revision.snapshot as { status: string }).status, "published");
   assert.equal((revision.snapshot as { title: string }).title, initial.title);
+  assert.equal(
+    (revision.snapshot as { bodyMarkdown: string }).bodyMarkdown,
+    initial.bodyMarkdown,
+  );
   assert.equal(
     await db.engineeringCase.count({ where: { articleId: a.id } }),
     0,
@@ -118,6 +124,7 @@ test("editor saves immutable snapshots and restores reviewed fields as a new pen
   assert.equal(restored.version, 3);
   assert.equal(restored.status, "pending_review");
   assert.equal(restored.title, initial.title);
+  assert.equal(restored.bodyMarkdown, initial.bodyMarkdown);
   assert.equal(restored.engineeringCase?.architecture, "架构");
   assert.equal(restored.topics.length, 1);
   assert.equal(restored.people.length, 1);

@@ -149,7 +149,7 @@ export default async function TopicPage({
             <h3>主题速览</h3>
             <dl className="metadata-list">
               <div>
-                <dt>已审核资料</dt>
+                <dt>公开资料</dt>
                 <dd>{t.articles.length}</dd>
               </div>
               <div>

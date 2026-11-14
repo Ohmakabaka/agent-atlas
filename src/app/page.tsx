@@ -213,6 +213,29 @@ export default async function Home() {
           ))}
         </div>
       </section>
+      {d.guides.length > 0 && (
+        <section>
+          <div className="section-heading">
+            <div>
+              <h2>
+                <BookOpen size={20} /> 把概念用起来
+              </h2>
+              <p>
+                六个工程问题，六篇原创实践指南。Codex
+                辅助创作，附核查资料与适用边界。
+              </p>
+            </div>
+            <Link href="/explore?source=agent-atlas-originals">
+              阅读全部指南 <ArrowUpRight size={14} />
+            </Link>
+          </div>
+          <div className="feature-grid">
+            {d.guides.map((guide) => (
+              <ArticleCard key={guide.id} article={guide} />
+            ))}
+          </div>
+        </section>
+      )}
       <div className="content-columns">
         <section>
           <div className="section-heading">

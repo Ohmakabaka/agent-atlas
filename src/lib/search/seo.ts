@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { editorialProvenance, EDITORIAL_AUTHOR } from "../editorial/schema";
 
 export function siteOrigin() {
   // Render supplies this at runtime, so the first deployment has working
@@ -42,6 +43,7 @@ type EditorialArticle = {
   publishedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  rawMetadata?: unknown;
 };
 export function articleMetadata(article: EditorialArticle): Metadata {
   return {
@@ -68,29 +70,39 @@ export function articleMetadata(article: EditorialArticle): Metadata {
   };
 }
 export function articleJsonLd(article: EditorialArticle) {
+  const editorial = editorialProvenance(article.rawMetadata);
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
     description: article.summary.slice(0, 5000),
     inLanguage: "zh-CN",
-    author: { "@type": "Organization", name: "Agent Atlas 编辑" },
+    author: {
+      "@type": "Organization",
+      name: editorial ? EDITORIAL_AUTHOR : "Agent Atlas 编辑",
+    },
     publisher: { "@type": "Organization", name: "Agent Atlas" },
     datePublished: article.createdAt.toISOString(),
     dateModified: article.updatedAt.toISOString(),
     ...(siteOrigin()
       ? { mainEntityOfPage: canonicalPath("articles", article.slug) }
       : {}),
-    isBasedOn: {
-      "@type": "CreativeWork",
-      name: article.originalTitle,
-      url: article.url,
-      ...(article.authorName
-        ? { author: { "@type": "Person", name: article.authorName } }
-        : {}),
-      ...(article.publishedAt
-        ? { datePublished: article.publishedAt.toISOString() }
-        : {}),
-    },
+    isBasedOn: editorial
+      ? editorial.references.map((reference) => ({
+          "@type": "CreativeWork",
+          name: reference.title,
+          url: reference.url,
+        }))
+      : {
+          "@type": "CreativeWork",
+          name: article.originalTitle,
+          url: article.url,
+          ...(article.authorName
+            ? { author: { "@type": "Person", name: article.authorName } }
+            : {}),
+          ...(article.publishedAt
+            ? { datePublished: article.publishedAt.toISOString() }
+            : {}),
+        },
   };
 }

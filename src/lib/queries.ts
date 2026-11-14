@@ -24,7 +24,7 @@ export function parseStringList(value: Prisma.JsonValue): string[] {
     : [];
 }
 export async function getHomeData() {
-  const [topics, featuredTopics, latest, engineering, sources, count] =
+  const [topics, featuredTopics, latest, engineering, sources, count, guides] =
     await Promise.all([
       prisma.topic.findMany({
         where: { parentId: null },
@@ -75,8 +75,22 @@ export async function getHomeData() {
         },
       }),
       prisma.article.count({ where: { status: "published" } }),
+      prisma.article.findMany({
+        where: { status: "published", sourceId: "source-agent-atlas" },
+        include: articleInclude,
+        orderBy: [{ publishedAt: "desc" }, { slug: "asc" }],
+        take: 6,
+      }),
     ]);
-  return { topics, featuredTopics, latest, engineering, sources, count };
+  return {
+    topics,
+    featuredTopics,
+    latest,
+    engineering,
+    sources,
+    count,
+    guides,
+  };
 }
 export async function getTopic(slug: string) {
   const topic = await prisma.topic.findUnique({

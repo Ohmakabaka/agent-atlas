@@ -169,6 +169,17 @@ export default async function ArticleEditor({
           />
         </label>
         <label className="field" style={fieldStyle}>
+          原创正文（支持 Markdown，可选）
+          <textarea
+            className="input"
+            name="bodyMarkdown"
+            rows={18}
+            maxLength={100000}
+            defaultValue={article.bodyMarkdown}
+            placeholder="用于本站原创教程；保留参考资料与创作说明，不粘贴未经授权的第三方全文。"
+          />
+        </label>
+        <label className="field" style={fieldStyle}>
           技术要点（每行一条）
           <textarea
             className="input"
@@ -244,10 +255,7 @@ export default async function ArticleEditor({
                   defaultValue={
                     article.engineeringCase?.[
                       name as
-                        | "problem"
-                        | "architecture"
-                        | "solution"
-                        | "outcome"
+                        "problem" | "architecture" | "solution" | "outcome"
                     ] || ""
                   }
                 />
@@ -275,7 +283,8 @@ export default async function ArticleEditor({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,220px),1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fit,minmax(min(100%,220px),1fr))",
               gap: 12,
             }}
           >

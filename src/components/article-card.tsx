@@ -41,9 +41,9 @@ export function ArticleCard({
       </Link>
       {!compact && (
         <>
-          <p className="original-title" lang="en">
-            {a.originalTitle}
-          </p>
+          {a.originalTitle !== a.title && (
+            <p className="original-title">{a.originalTitle}</p>
+          )}
           <p className="article-summary">{a.summary}</p>
           <div className="tags">
             {a.topics?.slice(0, 3).map(({ topic }) => (

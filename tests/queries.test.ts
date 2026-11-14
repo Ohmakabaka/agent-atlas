@@ -146,7 +146,8 @@ test("re-running seed preserves editor changes and does not duplicate content", 
   );
   const home = await query.getHomeData();
   assert.equal(home.topics.length, 7);
-  assert.equal(home.count, 27);
+  assert.equal(home.count, 33);
+  assert.equal(home.guides.length, 6);
   assert.ok(home.featuredTopics.length >= 3);
 });
 
@@ -176,6 +177,34 @@ test("search clamps pagination and ignores impossible calendar dates", async () 
     to: "2024-02-29",
   });
   assert.equal(leapDay.total, 0);
+});
+
+test("original guide body is searchable while source filters use the public source slug", async () => {
+  const entry = await db.article.findUniqueOrThrow({
+    where: { slug: "atlas-context-budget" },
+  });
+  const body = entry.bodyMarkdown;
+  try {
+    await db.article.update({
+      where: { id: entry.id },
+      data: { bodyMarkdown: `${body}\n\n独有正文检索哨兵` },
+    });
+    const found = await query.searchArticles({
+      q: "独有正文检索哨兵",
+      source: "agent-atlas-originals",
+    });
+    assert.equal(found.total, 1);
+    assert.equal(found.articles[0].slug, entry.slug);
+    const guides = await query.searchArticles({
+      source: "agent-atlas-originals",
+    });
+    assert.equal(guides.total, 6);
+  } finally {
+    await db.article.update({
+      where: { id: entry.id },
+      data: { bodyMarkdown: body },
+    });
+  }
 });
 
 test("weighted relevance ranks titles over newer summary-only matches and paginates stably", async () => {

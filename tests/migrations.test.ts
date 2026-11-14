@@ -57,6 +57,18 @@ test("editorial migration preserves existing articles and adds unique revisions 
         args: ["sync", "worker-b"],
       }),
     );
+    await client.executeMultiple(
+      await readFile(
+        "prisma/migrations/20261114020000_editorial_content/migration.sql",
+        "utf8",
+      ),
+    );
+    const upgraded = await client.execute(
+      "SELECT title,version,bodyMarkdown FROM Article WHERE id='a'",
+    );
+    assert.equal(upgraded.rows[0].title, "保留编辑");
+    assert.equal(upgraded.rows[0].version, 1);
+    assert.equal(upgraded.rows[0].bodyMarkdown, "");
   } finally {
     client.close();
     await rm(dir, { recursive: true, force: true });

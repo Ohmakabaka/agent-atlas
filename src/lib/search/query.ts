@@ -33,11 +33,11 @@ export function keywordSql(terms: string[], phrase: string) {
     Prisma.sql`EXISTS (SELECT 1 FROM "ArticleTopic" at JOIN "Topic" t ON t.id = at."topicId" WHERE at."articleId" = a.id AND (instr(lower(t.name), ${term}) > 0 OR instr(lower(t."englishName"), ${term}) > 0))`;
   const matches = terms.map(
     (term) =>
-      Prisma.sql`(instr(lower(a.title), ${term}) > 0 OR instr(lower(a."originalTitle"), ${term}) > 0 OR instr(lower(a.summary), ${term}) > 0 OR instr(lower(a."authorName"), ${term}) > 0 OR ${topicMatch(term)})`,
+      Prisma.sql`(instr(lower(a.title), ${term}) > 0 OR instr(lower(a."originalTitle"), ${term}) > 0 OR instr(lower(a.summary), ${term}) > 0 OR instr(lower(a."bodyMarkdown"), ${term}) > 0 OR instr(lower(a."authorName"), ${term}) > 0 OR ${topicMatch(term)})`,
   );
   const scores = terms.map(
     (term) =>
-      Prisma.sql`(CASE WHEN instr(lower(a.title), ${term}) > 0 THEN 100 ELSE 0 END + CASE WHEN instr(lower(a."originalTitle"), ${term}) > 0 THEN 80 ELSE 0 END + CASE WHEN ${topicMatch(term)} THEN 45 ELSE 0 END + CASE WHEN instr(lower(a."authorName"), ${term}) > 0 THEN 15 ELSE 0 END + CASE WHEN instr(lower(a.summary), ${term}) > 0 THEN 8 ELSE 0 END)`,
+      Prisma.sql`(CASE WHEN instr(lower(a.title), ${term}) > 0 THEN 100 ELSE 0 END + CASE WHEN instr(lower(a."originalTitle"), ${term}) > 0 THEN 80 ELSE 0 END + CASE WHEN ${topicMatch(term)} THEN 45 ELSE 0 END + CASE WHEN instr(lower(a."authorName"), ${term}) > 0 THEN 15 ELSE 0 END + CASE WHEN instr(lower(a.summary), ${term}) > 0 THEN 8 ELSE 0 END + CASE WHEN instr(lower(a."bodyMarkdown"), ${term}) > 0 THEN 3 ELSE 0 END)`,
   );
   return {
     match: matches.length ? Prisma.join(matches, " AND ") : Prisma.sql`1 = 1`,

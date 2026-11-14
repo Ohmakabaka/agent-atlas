@@ -48,6 +48,9 @@ async function main() {
     const oldTab = await context.newPage();
     await oldTab.goto(`${base}/admin/articles/${article.id}`);
     await page.locator('[name="title"]').fill(`已发布的新版本${run}`);
+    await page
+      .locator('[name="bodyMarkdown"]')
+      .fill("## 原创正文验收\n\n正文在公开页面可读，版本恢复会还原原始内容。");
     await page.locator('[name="hasEngineeringCase"]').check();
     await page.locator('[name="case_problem"]').fill("验证工程问题记录");
     await page.locator('[name="case_architecture"]').fill("服务器与数据库");
@@ -74,6 +77,14 @@ async function main() {
         .version,
       2,
     );
+    const publicView = await context.newPage();
+    await publicView.goto(`${base}/articles/${run}`);
+    assert(
+      await publicView
+        .getByRole("heading", { name: "原创正文验收", exact: true })
+        .isVisible(),
+    );
+    await publicView.close();
     await oldTab.locator('[name="title"]').fill(`过期窗口的输入仍需保留${run}`);
     await oldTab
       .getByRole("button", { name: "保存内容与审核状态", exact: true })
@@ -113,6 +124,7 @@ async function main() {
     assert.equal(restored.version, 3);
     assert.equal(restored.status, "pending_review");
     assert.equal(restored.title, article.title);
+    assert.equal(restored.bodyMarkdown, "");
     assert.equal(restored.engineeringCase, null);
     assert.equal(
       await prisma.articleRevision.count({ where: { articleId: article.id } }),
@@ -123,11 +135,9 @@ async function main() {
     );
     await page.goto(`${base}/admin/topics`);
     await page.getByText("＋ 新建技术主题", { exact: true }).click();
-    const form = page
-      .locator("form")
-      .filter({
-        has: page.getByRole("button", { name: "创建主题", exact: true }),
-      });
+    const form = page.locator("form").filter({
+      has: page.getByRole("button", { name: "创建主题", exact: true }),
+    });
     await form.locator('[name="name"]').fill(`浏览器新增主题${run}`);
     await form
       .locator('[name="englishName"]')

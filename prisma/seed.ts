@@ -7,6 +7,12 @@ import topics from "../data/topics.json";
 import articles from "../data/articles.json";
 import relations from "../data/relations.json";
 import people from "../data/people.json";
+import {
+  readEditorialPack,
+  verifyEditorialMarkdown,
+} from "../src/lib/editorial/files";
+import { importEditorialPack } from "../src/lib/editorial/import";
+import { INITIAL_EDITORIAL_SLUGS } from "../src/lib/editorial/schema";
 
 try {
   loadEnvFile();
@@ -95,6 +101,19 @@ async function main() {
     },
     { timeout: 30000 },
   );
+  // Only this explicitly selected launch pack is published on initialization.
+  // Later Codex packs use content:import (pending by default), never automatic publication.
+  const launchSlugs = new Set<string>(INITIAL_EDITORIAL_SLUGS);
+  const launchPack = (await readEditorialPack()).filter((entry) =>
+    launchSlugs.has(entry.slug),
+  );
+  if (launchPack.length !== launchSlugs.size)
+    throw new Error("首批原创指南内容包不完整");
+  await verifyEditorialMarkdown(launchPack);
+  const editorial = await importEditorialPack(db, launchPack, {
+    publish: true,
+  });
+  console.log(JSON.stringify({ editorial }));
   console.log(
     JSON.stringify({
       topics: await db.topic.count(),

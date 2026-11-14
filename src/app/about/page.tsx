@@ -39,9 +39,22 @@ export default function About() {
               <li>有可访问的原始链接；转载应追溯原出处，保留补充链接。</li>
               <li>精选标识是编辑推荐，不代替对研究结论的独立判断。</li>
             </ul>
+            <p>自动采集和运行时模型建议进入待审核流程，由编辑核对后发布。</p>
+          </section>
+          <section className="panel prose">
+            <h2>本站原创指南如何产生</h2>
             <p>
-              自动采集和机器建议一律进入待审核流程。机器草稿需经人工核对，才能作为公开内容展示。
+              启动阶段的六篇原创指南由 Codex
+              辅助创作，随代码保存了生成内容、核查日期和参考资料。
+              页面明确区分原始资料的描述与本站工程建议；来源核对不代表人工复核，也不代表相关方案已经过本站生产验证。
             </p>
+            <p>
+              指南的人工复核状态单独显示，后续编辑可在后台修订、复核或归档。
+              我们不虚构性能结果，不将第三方文档全文重新发布。
+            </p>
+            <Link href="/explore?source=agent-atlas-originals">
+              阅读原创指南 →
+            </Link>
           </section>
           <section className="panel prose">
             <h2>一条连接，不等于一次技术继承</h2>
@@ -86,7 +99,7 @@ export default function About() {
             <div className="panel">
               <h3>订阅更新</h3>
               <p className="muted" style={{ fontSize: 12, marginBottom: 14 }}>
-                通过RSS订阅最近收录的已审核中文导读。
+                通过RSS订阅最近发布的中文导读和原创指南。
               </p>
               <a href="/feed.xml" className="button secondary">
                 RSS订阅 →

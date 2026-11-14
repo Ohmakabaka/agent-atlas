@@ -45,6 +45,7 @@ test("structured metadata escapes executable markup and separates original autho
   assert.ok(!encoded.includes("</script>"));
   assert.equal(JSON.parse(encoded).headline, article.title);
   assert.equal(json.author.name, "Agent Atlas 编辑");
+  assert(!Array.isArray(json.isBasedOn));
   assert.equal(json.isBasedOn.author?.name, "Original author");
   assert.equal(json.datePublished, article.createdAt.toISOString());
   assert.equal(json.isBasedOn.datePublished, article.publishedAt.toISOString());
@@ -63,4 +64,33 @@ test("structured metadata escapes executable markup and separates original autho
     if (previous === undefined) delete process.env.SITE_URL;
     else process.env.SITE_URL = previous;
   }
+});
+
+test("Codex authored guides attribute their creation and reference evidence without exposing drafts", () => {
+  const article = {
+    slug: "atlas-example",
+    title: "本站原创指南",
+    originalTitle: "本站原创指南",
+    summary: "介绍本站教程的主题与适用边界。",
+    authorName: "Agent Atlas · Codex 辅助整理",
+    url: "https://github.com/Ohmakabaka/agent-atlas",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    publishedAt: new Date(),
+    rawMetadata: {
+      origin: "codex_session",
+      verifiedAt: "2026-11-14",
+      privateValue: "should-not-be-public",
+      references: [1, 2, 3].map((n) => ({
+        url: `https://example.org/doc-${n}`,
+        title: `原始资料${n}`,
+        locator: "说明所在章节",
+      })),
+    },
+  };
+  const json = articleJsonLd(article);
+  assert.equal(json.author.name, article.authorName);
+  assert(Array.isArray(json.isBasedOn));
+  assert.equal(json.isBasedOn.length, 3);
+  assert(!JSON.stringify(json).includes("should-not-be-public"));
 });

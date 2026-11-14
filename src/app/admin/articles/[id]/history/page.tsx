@@ -11,6 +11,7 @@ const labels: Record<string, string> = {
   originalTitle: "原始标题",
   url: "原文链接",
   summary: "中文导读",
+  bodyMarkdown: "原创正文",
   audience: "阅读人群",
   authorName: "作者",
   type: "内容类型",
