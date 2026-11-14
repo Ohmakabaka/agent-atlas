@@ -73,3 +73,6 @@ P0闭环已完成，可从主题探索进入资料，或在后台收录、修订
 
 - `806f7ee`：可靠采集、条件同步与worker已推送。
 - 本提交 `feat: complete knowledge graph and personal reading workspace`：真实有向证据图、10种关系、节点聚焦/列表、阅读收藏/已读/JSON导入导出、RSS与站点地图、动态SEO/JSON-LD、编辑准则；查询/SEO/阅读/Feed测试与生产Chromium通过，修复React19 SVG标题水合错误，移动布局无溢出。
+
+- `0b50dfa`：知识图谱、个人阅读库、SEO/RSS与编辑准则已推送。
+- 本提交 `feat: add verified deployment and database recovery operations`：非root Docker/Compose、健康检查、在线一致性备份、显式离线恢复并保留原库、动态后台构建回归、持续集成扩展；5项备份/健康测试通过，真实Docker中完成运行时登录/发布/历史/备份/恢复/同卷重启/worker退出验证。另修复订阅修改与在途响应的竞争，全部60项测试、类型检查、生产构建及5组浏览器脚本通过。

@@ -7,12 +7,13 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       DATABASE_URL: file:./ci.db
       ADMIN_PASSWORD: ci-only-local-editor-password
       SESSION_SECRET: ci-only-signing-secret-not-for-real-deployment-00000000
       ALLOW_INSECURE_ADMIN_COOKIE: "true"
+      SITE_URL: http://127.0.0.1:3000
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,7 +24,8 @@ jobs:
       - run: npm run db:init
       - run: npm run typecheck
       - run: npm test
-      - run: npm run build
+      - run: env -u ADMIN_PASSWORD -u SESSION_SECRET npm run build
+      - run: npm audit --audit-level=moderate
       - run: npx playwright install --with-deps chromium
       - name: Browser workflows against production server
         shell: bash

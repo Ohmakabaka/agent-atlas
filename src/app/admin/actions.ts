@@ -232,8 +232,24 @@ export async function saveSource(form: FormData) {
     };
     const id = text(form, "id");
     await prisma.$transaction(async (tx) => {
+      const previous = id
+        ? await tx.source.findUniqueOrThrow({ where: { id } })
+        : null;
+      const resetFeedState =
+        previous && previous.feedUrl !== data.feedUrl
+          ? {
+              etag: null,
+              lastModified: null,
+              lastCheckedAt: null,
+              lastSuccessAt: null,
+              lastError: null,
+            }
+          : {};
       const saved = id
-        ? await tx.source.update({ where: { id }, data })
+        ? await tx.source.update({
+            where: { id },
+            data: { ...data, ...resetFeedState },
+          })
         : await tx.source.create({ data });
       await tx.auditLog.create({
         data: {

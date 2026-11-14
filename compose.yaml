@@ -1,0 +1,61 @@
+name: agent-atlas
+services:
+  web:
+    build: .
+    image: agent-atlas:local
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: file:/app/storage/atlas.db
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      SITE_URL: ${SITE_URL:-http://localhost:3000}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com/v1}
+      AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
+      INGESTION_PROXY_HOSTS: ${INGESTION_PROXY_HOSTS:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      NO_PROXY: ${NO_PROXY:-}
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS:-}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+      TRUSTED_CLIENT_IP_HEADER: ${TRUSTED_CLIENT_IP_HEADER:-}
+      ALLOW_INSECURE_ADMIN_COOKIE: ${ALLOW_INSECURE_ADMIN_COOKIE:-false}
+    volumes:
+      - atlas-data:/app/storage
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+  worker:
+    image: agent-atlas:local
+    init: true
+    profiles: [sync]
+    restart: unless-stopped
+    command: ["node", "--import", "tsx", "scripts/worker.ts"]
+    healthcheck:
+      disable: true
+    depends_on:
+      web:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: file:/app/storage/atlas.db
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com/v1}
+      AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
+      INGESTION_PROXY_HOSTS: ${INGESTION_PROXY_HOSTS:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      NO_PROXY: ${NO_PROXY:-}
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS:-}
+      INGESTION_POLL_SECONDS: ${INGESTION_POLL_SECONDS:-60}
+    volumes:
+      - atlas-data:/app/storage
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+volumes:
+  atlas-data:

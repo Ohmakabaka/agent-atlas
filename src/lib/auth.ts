@@ -215,9 +215,10 @@ export async function recordAuthentication(
   });
 }
 export async function isAuthenticated() {
-  return (
-    authConfigured() && verifySession((await cookies()).get(COOKIE_NAME)?.value)
-  );
+  // Always read request cookies before checking runtime credentials. A build
+  // without secrets must not prerender an admin page's unauthenticated redirect.
+  const cookieStore = await cookies();
+  return authConfigured() && verifySession(cookieStore.get(COOKIE_NAME)?.value);
 }
 export async function requireAuth() {
   if (!(await isAuthenticated())) redirect("/admin/login");

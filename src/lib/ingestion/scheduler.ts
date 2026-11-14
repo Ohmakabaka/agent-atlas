@@ -6,6 +6,23 @@ import { parseFeed } from "./adapters";
 import { safeFetch, type SafeResponse, type RequestOptions } from "./network";
 
 const LEASE_MS = 120_000;
+class SourceChangedError extends Error {
+  constructor() {
+    super("订阅地址已在采集过程中变更，已丢弃旧请求结果；请检查新地址。");
+    this.name = "SourceChangedError";
+  }
+}
+
+async function updateSourceSnapshot(
+  source: { id: string; feedUrl: string | null },
+  data: Prisma.SourceUpdateManyMutationInput,
+) {
+  const updated = await prisma.source.updateMany({
+    where: { id: source.id, feedUrl: source.feedUrl },
+    data,
+  });
+  if (updated.count !== 1) throw new SourceChangedError();
+}
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message.slice(0, 500) : "采集失败";
 export type SyncOptions = {
@@ -133,10 +150,7 @@ export async function runSourceSync(
         },
       });
       jobId = job.id;
-      await prisma.source.update({
-        where: { id: source.id },
-        data: { lastCheckedAt: new Date() },
-      });
+      await updateSourceSnapshot(source, { lastCheckedAt: new Date() });
       const headers: Record<string, string> = {};
       if (source.etag) headers["If-None-Match"] = source.etag;
       if (source.lastModified)
@@ -147,12 +161,18 @@ export async function runSourceSync(
         signal: options.signal,
       });
       await renewLease(key, owner);
+      if (
+        !(await prisma.source.count({
+          where: { id: source.id, feedUrl: source.feedUrl },
+        }))
+      )
+        throw new SourceChangedError();
       if (response.status === 304) {
-        result.notModified++;
-        await prisma.source.update({
-          where: { id: source.id },
-          data: { lastSuccessAt: new Date(), lastError: null },
+        await updateSourceSnapshot(source, {
+          lastSuccessAt: new Date(),
+          lastError: null,
         });
+        result.notModified++;
         await prisma.ingestionJob.update({
           where: { id: job.id },
           data: {
@@ -181,23 +201,20 @@ export async function runSourceSync(
       }
       for (const error of errors)
         result.errors.push({ source: source.name, message: error.message });
-      await prisma.source.update({
-        where: { id: source.id },
-        data: {
-          lastError: errors.length
-            ? errors
-                .map((e) => e.message)
-                .join("; ")
-                .slice(0, 2000)
-            : null,
-          ...(!errors.length
-            ? {
-                etag: response.etag || null,
-                lastModified: response.lastModified || null,
-                lastSuccessAt: new Date(),
-              }
-            : {}),
-        },
+      await updateSourceSnapshot(source, {
+        lastError: errors.length
+          ? errors
+              .map((e) => e.message)
+              .join("; ")
+              .slice(0, 2000)
+          : null,
+        ...(!errors.length
+          ? {
+              etag: response.etag || null,
+              lastModified: response.lastModified || null,
+              lastSuccessAt: new Date(),
+            }
+          : {}),
       });
       await prisma.ingestionJob.update({
         where: { id: job.id },
@@ -224,15 +241,18 @@ export async function runSourceSync(
     } catch (error) {
       const message = errorMessage(error);
       result.errors.push({ source: source.name, message });
-      await prisma.source.update({
-        where: { id: source.id },
+      await prisma.source.updateMany({
+        where: { id: source.id, feedUrl: source.feedUrl },
         data: { lastError: message },
       });
       if (jobId)
         await prisma.ingestionJob.update({
           where: { id: jobId },
           data: {
-            status: options.signal?.aborted ? "interrupted" : "failed",
+            status:
+              options.signal?.aborted || error instanceof SourceChangedError
+                ? "interrupted"
+                : "failed",
             finishedAt: new Date(),
             failed: 1,
             imported,

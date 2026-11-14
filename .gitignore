@@ -156,3 +156,10 @@ vite.config.ts.timestamp-*
 *.db-shm
 playwright-report/
 test-results/
+
+# Persistent data and private recovery artifacts
+*.sqlite
+*.sqlite-*
+backups/
+storage/
+**/*.before-restore-*/

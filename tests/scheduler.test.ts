@@ -225,3 +225,75 @@ test("worker shuts down cleanly on SIGTERM without an active source", async () =
     if (child.exitCode === null) child.kill("SIGKILL");
   }
 });
+
+test("in-flight responses cannot refill validators or status after a feed URL edit", async () => {
+  for (const status of [200, 304, 503]) {
+    const source = await db.source.create({
+      data: {
+        slug: `changed-${status}`,
+        name: `Changed ${status}`,
+        url: `https://changed-${status}.example.org`,
+        feedUrl: `https://changed-${status}.example.org/old`,
+        platform: "web",
+        type: "official",
+        etag: '"old"',
+        lastModified: "Mon, 01 Jan 2024 00:00:00 GMT",
+      },
+    });
+    const newUrl = `https://changed-${status}.example.org/new`;
+    const result = await sync.runSourceSync(
+      { sourceId: source.id, force: true },
+      async (url) => {
+        await db.source.update({
+          where: { id: source.id },
+          data: {
+            feedUrl: newUrl,
+            etag: null,
+            lastModified: null,
+            lastCheckedAt: null,
+            lastSuccessAt: null,
+            lastError: null,
+          },
+        });
+        if (status === 503) throw new Error("Old endpoint failed");
+        return {
+          url,
+          status,
+          text: status === 200 ? feed : "",
+          contentType: "application/rss+xml",
+          etag: '"stale-response"',
+          lastModified: "Tue, 02 Jan 2024 00:00:00 GMT",
+        };
+      },
+    );
+    const current = await db.source.findUniqueOrThrow({
+      where: { id: source.id },
+    });
+    assert.equal(current.feedUrl, newUrl);
+    for (const field of [
+      "etag",
+      "lastModified",
+      "lastCheckedAt",
+      "lastSuccessAt",
+      "lastError",
+    ] as const)
+      assert.equal(current[field], null, `${status}: ${field}`);
+    assert.equal(result.imported, 0);
+    assert.equal(result.notModified, 0);
+    assert.equal(result.errors.length, 1);
+    assert.equal(await db.article.count({ where: { sourceId: source.id } }), 0);
+    assert.equal(
+      await db.syncLease.count({ where: { key: `feed:${source.id}` } }),
+      0,
+    );
+    if (status !== 503)
+      assert.equal(
+        (
+          await db.ingestionJob.findFirstOrThrow({
+            where: { sourceId: source.id },
+          })
+        ).status,
+        "interrupted",
+      );
+  }
+});

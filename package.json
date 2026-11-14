@@ -13,8 +13,10 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:init": "npm run db:generate && npm run db:migrate && npm run db:seed",
     "ingest": "tsx scripts/sync.ts",
-    "test:e2e": "tsx tests/public.e2e.ts && tsx tests/admin.e2e.ts",
-    "worker": "tsx scripts/worker.ts"
+    "test:e2e": "tsx tests/public.e2e.ts && tsx tests/admin.e2e.ts && tsx tests/editor.e2e.ts && tsx tests/discovery.e2e.ts && tsx tests/reading.e2e.ts",
+    "worker": "tsx scripts/worker.ts",
+    "db:backup": "tsx scripts/backup.ts",
+    "db:restore": "tsx scripts/restore.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",
