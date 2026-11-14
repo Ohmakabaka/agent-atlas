@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getSources } from "@/lib/queries";
-import { date } from "@/lib/labels";
+import { date, sourceTypes } from "@/lib/labels";
 export const dynamic = "force-dynamic";
 export default async function Sources() {
   const sources = await getSources();
@@ -34,7 +34,7 @@ export default async function Sources() {
                 <span className="source-avatar">
                   {s.name.slice(0, 2).toUpperCase()}
                 </span>
-                <span className="badge">{s.platform}</span>
+                <span className="badge">{sourceTypes[s.type] || s.type} · {s.platform}</span>
               </div>
               <h2>
                 <a href={s.url} target="_blank" rel="noopener noreferrer">

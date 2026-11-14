@@ -396,6 +396,8 @@ svg {
   margin-top: 4px;
 }
 .section-heading > a {
+  flex-shrink: 0;
+  white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1195,7 +1197,7 @@ input[type="checkbox"] {
     padding: 28px 23px;
   }
   .hero h1 {
-    font-size: 29px;
+    font-size: 26px;
     letter-spacing: -1px;
   }
   .constellation {

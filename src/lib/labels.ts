@@ -14,6 +14,15 @@ export const qualities: Record<string, string> = {
   curated: "精选",
   standard: "已收录",
 };
+export const sourceTypes: Record<string, string> = {
+  official: "官方来源",
+  paper: "学术论文",
+  repository: "开源项目",
+  community: "技术社区",
+  engineering: "工程团队",
+  docs: "技术文档",
+  website: "独立网站",
+};
 export const statuses: Record<string, string> = {
   discovered: "已发现",
   pending_review: "待审核",

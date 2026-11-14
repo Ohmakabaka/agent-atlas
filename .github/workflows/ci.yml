@@ -1,0 +1,45 @@
+name: Validate Agent Atlas
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: file:./ci.db
+      ADMIN_PASSWORD: ci-only-local-editor-password
+      SESSION_SECRET: ci-only-signing-secret-not-for-real-deployment-00000000
+      ALLOW_INSECURE_ADMIN_COOKIE: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run db:init
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Browser workflows against production server
+        shell: bash
+        run: |
+          npm start > /tmp/atlas-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 1
+          done
+          npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: diagnostics
+          path: |
+            /tmp/atlas-server.log
+            docs/screenshots/*.png
