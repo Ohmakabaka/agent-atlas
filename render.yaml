@@ -1,0 +1,33 @@
+# Review the selected paid plan and disk price in Render before creating.
+# The generated credentials stay in Render's private environment settings.
+services:
+  - type: web
+    name: agent-atlas
+    runtime: docker
+    repo: https://github.com/Ohmakabaka/agent-atlas
+    branch: work
+    plan: starter
+    numInstances: 1
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeploy: false
+    disk:
+      name: atlas-data
+      mountPath: /app/storage
+      sizeGB: 1
+    envVars:
+      - key: DATABASE_URL
+        value: file:/app/storage/atlas.db
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ALLOW_INSECURE_ADMIN_COOKIE
+        value: "false"
+      - key: TRUST_PROXY
+        value: "false"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: AI_API_KEY
+        value: ""

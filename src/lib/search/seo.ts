@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 
 export function siteOrigin() {
-  if (!process.env.SITE_URL) return undefined;
+  // Render supplies this at runtime, so the first deployment has working
+  // canonical URLs and feeds before a custom domain is configured.
+  const configured =
+    process.env.SITE_URL?.trim() || process.env.RENDER_EXTERNAL_URL?.trim();
+  if (!configured) return undefined;
   try {
-    const url = new URL(process.env.SITE_URL);
+    const url = new URL(configured);
     if (
       !["http:", "https:"].includes(url.protocol) ||
       url.username ||
