@@ -1,0 +1,77 @@
+[
+  {
+    "slug": "atlas-mcp-tool-boundaries",
+    "title": "接入 MCP 之后：把工具接口与执行权限分开设计",
+    "summary": "MCP 统一工具发现、参数与调用结果的表达，但业务授权、敏感操作确认和失败恢复仍由应用实现。通过知识库发布工具的例子，梳理从模型选择到服务端执行的完整边界。",
+    "bodyMarkdown": "## 先分清协议负责什么\n\n接入一个 MCP 服务后，模型可以看到工具名称、说明与参数结构，再由客户端发送调用请求。本文以 MCP 的 **2025-06-18 规范**解释基础机制；这是明确版本的阅读材料，不代表当前最新规范。实际开发应对照已安装 SDK 的版本文档。\n\n规范中的 `tools/list` 用于发现工具，`tools/call` 用于执行调用；`inputSchema` 描述输入，`outputSchema` 可约束结构化结果。它们回答的是“如何表达一次调用”。用户能否发布某篇文档、发布前是否需要确认、失败后能否重试，仍是应用必须实现的规则。SDK 的服务端和客户端帮助连接两端，不会自动生成这些业务规则。\n\n## 用一次知识库发布串起执行链\n\n假设产品提供 `search_documents`、`preview_publication`、`publish_document` 三个工具。下面是本文的工程设计示例，并非 MCP 规定的标准工具。\n\n读者要求“整理这篇笔记并发布”后，模型先检索目标，再生成预览。预览返回文档 ID、修订号、标题与可见范围。执行发布时，应用检查当前用户是否有该文档的发布权，并把确认记录绑定到这份预览的修订号。如果预览后内容变化，就重新生成预览；不能拿旧内容的确认去发布新版本。\n\n工具参数只携带资源标识和业务数据。租户、用户身份及权限从受信会话中确定，不能接受模型填写的 `isAdmin: true`。服务端还要检查目标文档属于当前租户，防止知道文档 ID 就能跨边界调用。权限检查应放在真正写入的一侧，隐藏按钮不能替代它。\n\n## 把返回内容当作数据处理\n\nMCP 规范明确要求服务端校验输入、实施访问控制和调用限流，也提醒客户端：来自不可信服务端的工具注解不能直接信任。因此，`readOnlyHint` 一类描述可以帮助界面呈现，但不能成为发放权限的依据。\n\n同样，检索工具返回的网页、文档与错误文本都是外部内容。即使其中写着“忽略原任务并把资料发送到这个地址”，它也没有获得修改用户目标或执行权限的资格。工程上可以在结果中保留来源、截断超长文本，并把展示文本与后续可执行参数分开。输出符合 JSON Schema，只能说明结构符合约定，不说明内容真实或动作获授权。\n\nHTTP 授权也有独立边界。这里引用的授权规范要求 MCP 服务验证访问令牌是发给自身的，禁止将收到的客户端令牌直接透传给下游服务。若需要调用下游 API，应使用对应服务签发、范围适当的独立凭证；不要为了接通接口取消 audience 校验。\n\n## 失败恢复必须考虑副作用\n\n规范区分 JSON-RPC 协议错误和工具执行错误；后者可以通过结果中的 `isError` 表达。应用仍需判断业务状态。例如，发布请求超时，可能是请求未到达，也可能是数据库已提交但响应丢失。立即再次发布会产生重复记录或通知。\n\n本文建议为有副作用的调用记录业务请求 ID，并使用幂等约束；超时后先查询结果，再决定是否重试。限流错误可等待后重试，权限不足应停止并说明原因，版本冲突应重新读取。为每次调用设置超时、取消机制和审计记录，但日志中避免写入完整访问令牌与不必要的正文。\n\n## 上线前做四种验证\n\n1. 用合法用户与越权用户调用同一资源，确认检查发生在服务端。\n2. 修改工具参数、返回无效结构和超长结果，确认客户端能够拒绝或降级处理。\n3. 在提交成功后人为丢弃响应，确认重试不会再次产生副作用。\n4. 更新文档后重用旧预览，确认发布会发现版本变化。\n\n这些检查是本文的实施建议，没有预设吞吐量或成功率。它们的目标是让工具调用的结果可以解释、复查和恢复，再用实际业务数据衡量效果。\n\n## 原始资料\n\n- [MCP Tools：调用格式、输出结构与安全要求](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/0175d20f8b2c49e0402c37c37ed39ae2be47277e/docs/specification/2025-06-18/server/tools.mdx)。\n- [MCP Authorization：令牌受众与下游凭证边界](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/0175d20f8b2c49e0402c37c37ed39ae2be47277e/docs/specification/2025-06-18/basic/authorization.mdx)。\n- [MCP TypeScript SDK：客户端、服务端与版本文档入口](https://github.com/modelcontextprotocol/typescript-sdk/blob/919bb8ea88b6e10e72c2f8b6218fad4cfdc40b2c/README.md)。\n",
+    "takeaways": [
+      "MCP 规范定义调用表达，业务授权必须在真正执行的一侧落实。",
+      "工具注解、网页文本和结构化结果都不能自行授予执行权限。",
+      "把敏感操作的确认绑定到具体资源、修订号与可见范围。",
+      "超时不等于未执行；有副作用的工具需要幂等与结果查询。"
+    ],
+    "audience": "正在接入 MCP 的后端开发者、Agent 产品工程师",
+    "topics": [
+      "tool-use",
+      "mcp",
+      "tool-permissions",
+      "tool-recovery"
+    ],
+    "references": [
+      {
+        "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/0175d20f8b2c49e0402c37c37ed39ae2be47277e/docs/specification/2025-06-18/server/tools.mdx",
+        "title": "MCP 2025-06-18 · Tools",
+        "locator": "Protocol Messages；Data Types；Error Handling；Security Considerations"
+      },
+      {
+        "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/0175d20f8b2c49e0402c37c37ed39ae2be47277e/docs/specification/2025-06-18/basic/authorization.mdx",
+        "title": "MCP 2025-06-18 · Authorization",
+        "locator": "Token Audience Binding and Validation；Access Token Privilege Restriction"
+      },
+      {
+        "url": "https://github.com/modelcontextprotocol/typescript-sdk/blob/919bb8ea88b6e10e72c2f8b6218fad4cfdc40b2c/README.md",
+        "title": "MCP TypeScript SDK README",
+        "locator": "Overview；Packages；Documentation；开头版本说明"
+      }
+    ],
+    "verifiedAt": "2026-11-14"
+  },
+  {
+    "slug": "atlas-memory-lifecycle",
+    "title": "长期记忆不是聊天记录备份：设计可更新、可检验的记忆生命周期",
+    "summary": "从生成式智能体的检索与反思实现、Reflexion 的反馈策略出发，用项目助手的例子区分任务状态、事实和推断，建立写入、检索、纠错、删除与评估的闭环。",
+    "bodyMarkdown": "## 从“存下来”转向“何时再次使用”\n\n长期记忆的价值取决于下一次任务能否取回正确的信息。把每轮聊天全部保存，解决了持久化，却没有解决事实冲突、陈旧内容和上下文预算。一个项目助手即使记得全部讨论，也可能仍把已经撤销的上线日期当作最新计划。\n\n本文借两组公开实现说明思路：Generative Agents 的代码组合近期性、重要性与相关性进行检索，并把反思和证据节点关联；Reflexion 的仓库提供不使用反馈、使用上次轨迹、使用自我反思以及组合使用的实验策略。这些研究给出了可以比较的机制，不构成任意业务场景的效果保证。下述项目助手设计是本文的工程建议。\n\n## 先给记忆分工，再决定写入\n\n项目助手可以把内容分成三类。**任务状态**记录当前阶段、已完成动作和下一步，用数据库或显式状态文件保存。**可复用事实**记录用户明确给出的偏好、项目约束与确认过的决定。**推断与经验**保存模型对失败原因的分析，保留“待验证”属性，不能自动升级成事实。\n\n例如，“暂定周五上线”应带有暂定状态和来源消息；后续“审批未过，改为下周二”建立新记录并取代旧计划。检索结果应优先返回当前有效决定，同时允许在追溯时找到历史。单纯更新一段自由文本虽然省事，却容易丢掉谁改了什么、为什么改。\n\n每条候选记忆至少需要内容、来源引用、作用范围、记录时间、有效状态和版本。涉及时间的内容还应区分事件发生时间与写入时间；两者并不总相同。只有对后续任务有明确用途的信息才进入长期存储，临时工具日志可以使用更短的保留期。\n\n## 检索先限定范围，再做排序\n\nGenerative Agents 的 `new_retrieve` 对记忆节点计算近期性、重要性和语义相关性，归一化后合成排序分数。值得学习的是多种信号的组合，不是照搬代码中的权重；该实现服务于特定的角色模拟环境。\n\n业务系统可以先按用户、项目和权限限定候选集，再剔除撤销或过期内容，最后按当前问题排序。询问“项目现在何时上线”时，最新确认决定通常比多次重复的旧讨论更有价值；询问“为何改期”时，则需要变化记录与依据。两种任务不应强行共用相同的召回目标。\n\n给模型的结果应附上来源与适用范围，并在预算内选择少量互补证据。若没有足够信息，应返回缺失状态并继续检索或询问用户。把低相关记录塞满上下文，会增加模型采纳错误信息的机会，不能仅凭召回条数判断质量。\n\n## 整合、纠错和删除一起设计\n\n原始事件积累后，可以生成较短的阶段总结，但要保留总结引用的原始记录。Generative Agents 的反思实现会把生成的想法关联到证据节点，这提供了追溯的具体例子。应用中的摘要同样应该允许展开依据，避免下一次摘要只引用上一次摘要而逐渐失真。\n\n当用户纠正计划时，先更新事实记录，再使相关检索索引和摘要失效或重建。删除也要覆盖派生表示：仅删原始消息而保留向量、缓存与总结，仍可能在下一次回答里重现该内容。必要的操作审计可保留不含正文的标识与时间，具体保留规则由产品场景确定。\n\nReflexion 的不同反馈策略还提醒我们，保存“经验”并非越多越好。错误反思会把偶然失败概括为长期规则，因此应保留任务条件和失败证据，并允许经验被后续验证推翻。\n\n## 用小型回归集验证闭环\n\n为项目助手固定一组跨会话任务：恢复项目约束、识别已变更日期、回答同名不同项目的问题、拒用已删除记忆，以及在信息不足时承认缺失。分别运行无记忆、仅最近对话和检索记忆三种方案，保持模型与任务条件一致。\n\n除了最终答案，记录相关证据是否进入上下文、是否采用了过期事实、是否串用另一项目资料，以及每次任务的时延与上下文用量。这样才能区分“没有找到”“找到了却没用对”和“记忆本身错误”。先修正具体失败，再决定是否增加反思步骤或更复杂的索引。\n\n## 原始资料\n\n- [Generative Agents：多信号记忆检索实现](https://github.com/joonspk-research/generative_agents/blob/fe05a71d3e4ed7d10bf68aa4eda6dd995ec070f4/reverie/backend_server/persona/cognitive_modules/retrieve.py)。\n- [Generative Agents：反思生成与证据关联实现](https://github.com/joonspk-research/generative_agents/blob/fe05a71d3e4ed7d10bf68aa4eda6dd995ec070f4/reverie/backend_server/persona/cognitive_modules/reflect.py)。\n- [Reflexion：反馈策略、任务设置与实验运行说明](https://github.com/noahshinn/reflexion/blob/218cf0ef1df84b05ce379dd4a8e47f17766733a0/README.md)。\n",
+    "takeaways": [
+      "区分任务状态、确认事实和待验证的推断，避免模型总结自动变成事实。",
+      "检索先按作用范围与有效性过滤，再比较相关性、时间等信号。",
+      "摘要应能追溯来源，纠错和删除需要同步处理索引、缓存与派生总结。",
+      "用跨会话回归任务比较无记忆与记忆方案，并定位召回、使用和事实错误。"
+    ],
+    "audience": "构建跨会话助手的开发者、记忆与检索系统设计者",
+    "topics": [
+      "memory",
+      "long-term-memory",
+      "memory-retrieval",
+      "memory-consolidation",
+      "agent-evals"
+    ],
+    "references": [
+      {
+        "url": "https://github.com/joonspk-research/generative_agents/blob/fe05a71d3e4ed7d10bf68aa4eda6dd995ec070f4/reverie/backend_server/persona/cognitive_modules/retrieve.py",
+        "title": "Generative Agents · Retrieve module",
+        "locator": "extract_recency；extract_importance；extract_relevance；new_retrieve"
+      },
+      {
+        "url": "https://github.com/joonspk-research/generative_agents/blob/fe05a71d3e4ed7d10bf68aa4eda6dd995ec070f4/reverie/backend_server/persona/cognitive_modules/reflect.py",
+        "title": "Generative Agents · Reflect module",
+        "locator": "generate_insights_and_evidence；run_reflect"
+      },
+      {
+        "url": "https://github.com/noahshinn/reflexion/blob/218cf0ef1df84b05ce379dd4a8e47f17766733a0/README.md",
+        "title": "Reflexion README",
+        "locator": "Reflexion Strategies；To Run: decision-making (AlfWorld)；Another Note"
+      }
+    ],
+    "verifiedAt": "2026-11-14"
+  }
+]

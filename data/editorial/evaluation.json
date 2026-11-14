@@ -1,0 +1,85 @@
+[
+  {
+    "slug": "atlas-evaluation-regression",
+    "title": "Agent 评测落地：从任务定义到持续回归",
+    "summary": "以 SWE-bench、WebArena 和模型裁判工具为线索，建立任务定义、可执行判定、成本记录与失败回归的完整流程。重点是让每次改动可比较，而非追逐一个脱离业务约束的总分。",
+    "bodyMarkdown": "## 先写清楚什么叫完成\n\n“回答看起来合理”很难判断 Agent 是否解决了任务。假设你在做客服 Agent，目标是为符合规则的订单建立退款申请。成功条件应包括订单匹配、资格核对、正确申请记录和清晰回复；回复中说“已处理”不能替代业务数据库中的结果。这个例子是编辑设计的教学场景，不是已验证的产品案例。\n\nSWE-bench 把代码仓库和 GitHub 问题交给系统，要求生成修复补丁，并提供可复现的评测环境。WebArena 则提供网站交互任务，要求正确配置网站并在实验后恢复初始环境。二者给出的共同线索是：任务输入、执行环境和结果判定需要一起定义。一个基准通过率只说明对应任务集合与运行条件下的表现。\n\n## 把业务需求变成任务卡\n\n建议每个案例至少保存六项：初始数据、用户目标、允许动作、禁止动作、完成判定和资源预算。例如退款案例允许读取订单和创建申请，但不能修改订单原价；正确结果是指定订单出现一条金额一致的申请，且其他订单没有变化。再增加资格不符、重复请求和工具超时等变体。\n\n任务卡中的数据版本、工具版本、提示词版本和模型标识必须可追溯。若环境依赖时钟或外部搜索，固定测试时间或记录当时返回的证据。不要把同一任务第二次运行留下的业务状态当作干净起点，否则改动前后的结果已经失去可比性。\n\n## 分开看结果、过程与代价\n\n结果层优先使用可执行规则，例如数据库断言、测试命令和输出结构校验。过程层检查是否越过权限边界、是否遗漏必要步骤、是否重复执行带副作用的动作。代价层记录总耗时、模型调用量、工具调用量、重试次数和人工接管次数。最终成功但进行了多次重复退款，仍应判为失败。\n\n开放式说明文字可以增加模型裁判。FastChat 的 LLM Judge 文档提供单回答评分、成对比较和人与模型判定一致性分析的方法；这支持把裁判作为一种评测工具，并不保证它适合你的业务。编辑建议先用少量人工标注案例校准评分标准，保存裁判模型、提示词和原始理由，对关键失败保留复核入口。能由程序确认的事实，不应只交给另一个模型判断。\n\n## 用配对实验解释改动\n\n先在同一组任务和同一预算下运行旧版本与新版本，再查看每个任务的变化。总成功率提高时，也要找出“原来成功、现在失败”的案例，并按工具选择、信息缺失、状态污染、执行错误或判定错误分类。对于存在随机性的任务，可以重复运行并报告波动；单次漂亮结果不足以证明稳定改进。\n\nSWE-bench 当前文档特别说明，结果缓存依赖运行标识与实例标识，更换补丁却复用标识可能直接读取旧结果。这个具体实现提醒我们：实验缓存也是实验条件的一部分。自己的评测系统应为每次对比记录配置摘要，并核对是否真的执行了新版本。\n\n## 让线上问题进入回归集\n\n遇到真实失败后，先移除个人信息和凭证，再提炼一个可独立重现的任务。保留必要边界条件，避免只是复制一整段聊天。新用例加入固定回归集后，提示词、模型、工具 schema 和检索策略的变更都应触发相应测试。\n\n以下是编辑建议的首次落地清单：\n\n- 选择覆盖常见需求与失败边界的一组任务，写出机器可判定的成功条件。\n- 固定初始状态和版本，保留一次完整执行记录，并验证失败时也能留证。\n- 把成功率、成本、越权和人工接管分别展示，避免压成无法解释的总分。\n- 对一次实际失败建立回归用例，确认旧版本失败、修复版本通过。\n\n## 原始资料\n\n1. [SWE-bench：任务定义、Docker 环境与结果缓存说明](https://github.com/SWE-bench/SWE-bench/blob/02e7a74ffd0b707aab73d203fe87bdc7c76afc8e/README.md)。\n2. [WebArena：端到端评测与环境重置要求](https://github.com/web-arena-x/webarena/blob/dce04686a56253aefba7b18a4fa0937cf1dc987b/README.md)。\n3. [FastChat LLM Judge：评分、成对比较与一致性分析](https://github.com/lm-sys/FastChat/blob/587d5cfa1609a43d192cedb8441cac3c17db105d/fastchat/llm_judge/README.md)。\n\n本文为基于上述公开资料的原创教学整理。退款任务、评测流程和执行清单是编辑建议，不是来源项目报告的实验结果。",
+    "takeaways": [
+      "把任务目标、初始状态、允许动作和完成判定一起保存。",
+      "分别衡量最终结果、执行轨迹和资源成本，不用一个总分掩盖失败。",
+      "模型裁判适合补充开放式质量评估，可执行事实优先采用程序判定。",
+      "保持配置和缓存可追溯，把经过脱敏的实际失败转成回归用例。"
+    ],
+    "audience": "Agent 开发者、测试工程师、技术负责人",
+    "topics": [
+      "evaluation",
+      "agent-evals",
+      "trajectory-evaluation",
+      "regression-testing",
+      "llm-as-judge"
+    ],
+    "references": [
+      {
+        "url": "https://github.com/SWE-bench/SWE-bench/blob/02e7a74ffd0b707aab73d203fe87bdc7c76afc8e/README.md",
+        "title": "SWE-bench README",
+        "locator": "Overview / Set Up / Usage / Result Caching"
+      },
+      {
+        "url": "https://github.com/web-arena-x/webarena/blob/dce04686a56253aefba7b18a4fa0937cf1dc987b/README.md",
+        "title": "WebArena README",
+        "locator": "End-to-end Evaluation：自行部署评测网站及重置环境"
+      },
+      {
+        "url": "https://github.com/lm-sys/FastChat/blob/587d5cfa1609a43d192cedb8441cac3c17db105d/fastchat/llm_judge/README.md",
+        "title": "FastChat LLM Judge README",
+        "locator": "MT-Bench / Other grading options / Agreement Computation"
+      }
+    ],
+    "verifiedAt": "2026-11-14"
+  },
+  {
+    "slug": "atlas-durable-agent-execution",
+    "title": "让 Agent 能恢复：状态、工具副作用与故障演练",
+    "summary": "长任务的可靠性取决于进程重启后能否辨认已完成动作、未完成动作和待确认结果。结合 LangGraph 与 OpenAI Agents SDK 的公开文档，梳理持久状态、幂等工具、暂停恢复和可观测性。",
+    "bodyMarkdown": "## 恢复之前，先知道哪里停了\n\n一个调研 Agent 已抓取资料、整理结论并准备发布文章，此时进程退出。重启后直接把原始问题再交给模型，可能重复抓取、生成不同草稿，甚至重复发布。可靠执行需要保存可恢复的任务状态，而不是只保留聊天记录。\n\nLangGraph 的 README 将持久执行、人在回路和记忆列为基础能力。OpenAI Agents SDK 的运行文档描述模型调用、工具执行、交接与结束条件，并允许通过 RunState 恢复暂停的任务。这些是框架提供的机制；业务动作是否已经对外生效，仍需要应用自己确认。下文的文章发布流程是编辑设计的例子，不代表两个项目给出了完全相同的执行保证。\n\n## 把任务状态与对话分开\n\n建议保存任务标识、当前阶段、输入版本、已选资料、草稿版本、待处理动作及外部结果标识。对话历史用于帮助模型理解上下文，任务状态则用于决定下一步允许执行什么。两者可以关联，但不要把模型上一句“已经发布”当成数据库状态。\n\n以发布流程为例，可区分准备中、待审阅、执行中、已确认和失败。状态更新应附带版本检查，防止两个执行器同时推进同一个任务。若采用租约，要定义到期后的接管规则，并让旧执行器失去写入资格；一个时间戳本身不会自动解决并发冲突。\n\n## 最难的是外部动作已成功但本地未记录\n\n假设发布接口已接受请求，网络却在返回文章 ID 前中断。直接重试可能生成第二篇文章。编辑建议为同一个业务动作生成稳定幂等键，并由接收方记录结果；重试时复用该键，而不是每次随机生成。若接口不支持幂等，应先按任务标识查询既有结果，再决定重试或交给人工核对。普通查询未找到结果，不代表可以安全重试：旧请求可能仍在执行。应通过权威状态核对；结果仍未知时，不自动重放写操作。\n\n因此，恢复设计要明确三个状态：确定未执行、确定已执行、执行结果未知。网络超时通常只能说明调用方没有得到结果，不能推出服务端没有执行。对结果未知的写操作，盲目自动重试比暂停更容易扩大影响。对于只读查询，可以采用更积极的重试；仍应限制总次数、等待时间和整体预算。\n\n## 暂停点必须可以真正恢复\n\nOpenAI Agents SDK 的人在回路文档介绍了 interruptions、RunState 序列化以及批准或拒绝后的恢复。可以借此把“待发布草稿”作为一个明确暂停点，保存待执行参数，待决策后继续。文档也区分单次调用批准和持续批准，因此应用应选择符合自身权限边界的规则。\n\n编辑建议审批界面展示具体目标、内容版本与动作参数，恢复时重新核对这些条件。如果草稿在等待期间被修改，旧版本的同意不应自动覆盖新内容。状态序列化文件也可能包含敏感上下文，应限制访问、保留期限与日志输出。框架能暂停，不等于存储、权限和审批展示已经替你完成。\n\n## 为排障留下足够的执行证据\n\nOpenAI Agents SDK 的 tracing 文档描述了模型调用、工具调用、交接等事件与 trace/span 的组织方式。实际项目可以沿用一次任务一个关联标识的思路，把状态变化、工具耗时、重试和外部对象标识串起来。记录应足够定位问题，同时避免把访问令牌、完整用户资料和未经筛选的工具输出全部写进日志。\n\n还要区分“最后一个可见日志”和“最后一个已持久化状态”。日志可能批量导出；进程被终止时，最末尾事件未必已经送达。恢复逻辑应读取权威存储，日志帮助解释过程，不能单独承担业务提交记录。\n\n## 用故障演练检验承诺\n\n上线前可以按以下编辑建议演练：\n\n- 在只读工具返回后终止进程，重启后检查任务能否继续。\n- 在写请求发送后、收到响应前模拟断网，确认不会重复发布。\n- 同时启动两个执行器，检查同一动作是否只被有效执行一次。\n- 暂停审批后修改草稿，确认恢复时检查版本与授权范围。\n- 制造持续超时，确认任务会在预算耗尽后停止，并保留可诊断原因。\n\n这些检查验证的是你实际接入的存储和工具链。只有演练通过，才有依据描述自己的恢复能力；仅选择了一个支持持久执行的框架，不足以宣称整个系统具备“恰好一次”语义。\n\n## 原始资料\n\n1. [LangGraph README：持久执行、人在回路与记忆](https://github.com/langchain-ai/langgraph/blob/08a2016953789a4f579b4d36bd1967941ec62012/README.md)。\n2. [OpenAI Agents SDK：运行循环与恢复输入](https://github.com/openai/openai-agents-python/blob/64fbde5d02b42ae5f9db668eb0184cdb3fc9d775/docs/running_agents.md)。\n3. [OpenAI Agents SDK：暂停、序列化和人工决策](https://github.com/openai/openai-agents-python/blob/64fbde5d02b42ae5f9db668eb0184cdb3fc9d775/docs/human_in_the_loop.md)。\n4. [OpenAI Agents SDK：Tracing 与批量导出](https://github.com/openai/openai-agents-python/blob/64fbde5d02b42ae5f9db668eb0184cdb3fc9d775/docs/tracing.md)。\n\n本文为原创教学整理。幂等键、状态设计及故障演练清单是编辑建议，未声称任何项目已经完成这些演练或提供未核实的性能结果。",
+    "takeaways": [
+      "持久任务状态与对话历史承担不同职责，恢复应以权威状态为准。",
+      "区分确定未执行、确定已执行和结果未知，超时不等于动作未发生。",
+      "为外部写操作设计稳定幂等键，并检查接收方是否真正支持去重。",
+      "暂停恢复需要同时核对具体参数、内容版本和授权范围。",
+      "用进程退出、断网和并发执行演练验证恢复能力，不把框架特性等同于系统保证。"
+    ],
+    "audience": "Agent 工程师、后端工程师、运维与技术负责人",
+    "topics": [
+      "engineering",
+      "reliability",
+      "state-management",
+      "tool-recovery",
+      "human-in-the-loop",
+      "observability"
+    ],
+    "references": [
+      {
+        "url": "https://github.com/langchain-ai/langgraph/blob/08a2016953789a4f579b4d36bd1967941ec62012/README.md",
+        "title": "LangGraph README",
+        "locator": "Why use LangGraph?：Durable execution / Human-in-the-loop / Comprehensive memory"
+      },
+      {
+        "url": "https://github.com/openai/openai-agents-python/blob/64fbde5d02b42ae5f9db668eb0184cdb3fc9d775/docs/running_agents.md",
+        "title": "OpenAI Agents SDK — Running agents",
+        "locator": "Runner lifecycle and configuration / The agent loop / RunState input"
+      },
+      {
+        "url": "https://github.com/openai/openai-agents-python/blob/64fbde5d02b42ae5f9db668eb0184cdb3fc9d775/docs/human_in_the_loop.md",
+        "title": "OpenAI Agents SDK — Human-in-the-loop",
+        "locator": "How the approval flow works / Example: pause, approve, resume"
+      },
+      {
+        "url": "https://github.com/openai/openai-agents-python/blob/64fbde5d02b42ae5f9db668eb0184cdb3fc9d775/docs/tracing.md",
+        "title": "OpenAI Agents SDK — Tracing",
+        "locator": "Traces and spans / Default tracing / Long-running workers and immediate exports"
+      }
+    ],
+    "verifiedAt": "2026-11-14"
+  }
+]
