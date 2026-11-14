@@ -10,7 +10,6 @@ import { validatePublicUrl } from "./network";
 import {
   githubAdapter,
   parseBatch,
-  rssAdapter,
   urlAdapter,
   wechatAdapter,
   type DiscoveredItem,
@@ -136,59 +135,75 @@ export async function ingestItem(item: DiscoveredItem): Promise<ImportResult> {
     [originalTitle, item.description, item.summary].filter(Boolean).join("\n"),
     topics,
   );
-  const article = await prisma.article.create({
-    data: {
-      slug: articleSlug(originalTitle, canonicalUrl),
-      title: (item.title || originalTitle).slice(0, 500),
-      originalTitle,
-      url,
-      canonicalUrl,
-      sourceId: source.id,
-      organizationId: source.organizationId,
-      authorName: item.authorName?.slice(0, 200) || "",
-      publishedAt,
-      type: ["paper", "article", "docs", "repository", "podcast"].includes(
-        item.type || "",
-      )
-        ? item.type
-        : "article",
-      layer: ["primary", "community", "engineering"].includes(item.layer || "")
-        ? item.layer
-        : item.adapter === "wechat"
-          ? "community"
-          : "primary",
-      language: item.language === "zh" ? "zh" : "en",
-      status: "pending_review",
-      quality: "standard",
-      summary: item.summary?.slice(0, 20_000) || "",
-      rawMetadata: asJson({
-        ...item,
-        discoveredAt: new Date().toISOString(),
-        fullTextStored: false,
-      }),
-      aiDraft: asJson({
-        provider: "heuristic",
-        topicSuggestions: suggestions,
-        titleSuggestion: null,
-        summaryDraft: null,
-        note: "规则推荐，尚未经人工审核。",
-      }),
-      links: {
-        create: [...new Set([url, canonicalUrl])].map((link) => ({
-          url: link,
-          label: link === canonicalUrl ? "规范链接" : "收录链接",
-        })),
+  let article;
+  try {
+    article = await prisma.article.create({
+      data: {
+        slug: articleSlug(originalTitle, canonicalUrl),
+        title: (item.title || originalTitle).slice(0, 500),
+        originalTitle,
+        url,
+        canonicalUrl,
+        sourceId: source.id,
+        organizationId: source.organizationId,
+        authorName: item.authorName?.slice(0, 200) || "",
+        publishedAt,
+        type: ["paper", "article", "docs", "repository", "podcast"].includes(
+          item.type || "",
+        )
+          ? item.type
+          : "article",
+        layer: ["primary", "community", "engineering"].includes(
+          item.layer || "",
+        )
+          ? item.layer
+          : item.adapter === "wechat"
+            ? "community"
+            : "primary",
+        language: item.language === "zh" ? "zh" : "en",
+        status: "pending_review",
+        quality: "standard",
+        summary: item.summary?.slice(0, 20_000) || "",
+        rawMetadata: asJson({
+          ...item,
+          discoveredAt: new Date().toISOString(),
+          fullTextStored: false,
+        }),
+        aiDraft: asJson({
+          provider: "heuristic",
+          topicSuggestions: suggestions,
+          titleSuggestion: null,
+          summaryDraft: null,
+          note: "规则推荐，尚未经人工审核。",
+        }),
+        links: {
+          create: [...new Set([url, canonicalUrl])].map((link) => ({
+            url: link,
+            label: link === canonicalUrl ? "规范链接" : "收录链接",
+          })),
+        },
+        outgoing: {
+          create: suggestions.map((topic) => ({
+            type: "related_to",
+            status: "suggested",
+            toTopicId: topic.id,
+            description: `关键词建议：${topic.matched.join("、")}；需人工核对。`,
+          })),
+        },
       },
-      outgoing: {
-        create: suggestions.map((topic) => ({
-          type: "related_to",
-          status: "suggested",
-          toTopicId: topic.id,
-          description: `关键词建议：${topic.matched.join("、")}；需人工核对。`,
-        })),
-      },
-    },
-  });
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      const concurrent = await prisma.article.findUnique({
+        where: { canonicalUrl },
+      });
+      if (concurrent) return ingestItem(item);
+    }
+    throw error;
+  }
   return { articleId: article.id, slug: article.slug, duplicate: false };
 }
 
@@ -205,7 +220,10 @@ export async function importUrl(
         ? githubAdapter
         : urlAdapter;
   const job = await prisma.ingestionJob.create({
-    data: { adapter: adapter.name },
+    data: {
+      adapter: adapter.name,
+      details: asJson({ url: url.href, metadata }),
+    },
   });
   try {
     let item: DiscoveredItem;
@@ -229,6 +247,8 @@ export async function importUrl(
         imported: result.duplicate ? 0 : 1,
         duplicates: result.duplicate ? 1 : 0,
         details: asJson({
+          url: url.href,
+          metadata,
           warning: warning || null,
           articleId: result.articleId,
         }),
@@ -280,64 +300,4 @@ export async function importBatch(text: string, format: "json" | "csv") {
   return result;
 }
 
-export async function syncSources() {
-  const sources = await prisma.source.findMany({
-    where: { enabled: true, feedUrl: { not: null } },
-  });
-  const result: {
-    sources: number;
-    imported: number;
-    duplicates: number;
-    errors: Array<{ source: string; message: string }>;
-  } = { sources: sources.length, imported: 0, duplicates: 0, errors: [] };
-  for (const source of sources) {
-    const job = await prisma.ingestionJob.create({
-      data: { adapter: "rss", sourceId: source.id },
-    });
-    let imported = 0,
-      duplicates = 0,
-      failed = 0;
-    const errors: string[] = [];
-    try {
-      const items = await rssAdapter.discover(source.feedUrl!);
-      for (const item of items) {
-        try {
-          const entry = await ingestItem({ ...item, sourceId: source.id });
-          if (entry.duplicate) duplicates++;
-          else imported++;
-        } catch (error) {
-          failed++;
-          errors.push(message(error));
-        }
-      }
-      await prisma.source.update({
-        where: { id: source.id },
-        data: { lastCheckedAt: new Date() },
-      });
-    } catch (error) {
-      failed++;
-      errors.push(message(error));
-    }
-    await prisma.ingestionJob.update({
-      where: { id: job.id },
-      data: {
-        status: failed
-          ? imported || duplicates
-            ? "completed_with_errors"
-            : "failed"
-          : "completed",
-        finishedAt: new Date(),
-        imported,
-        duplicates,
-        failed,
-        error: errors.join("; ").slice(0, 2000) || null,
-      },
-    });
-    result.imported += imported;
-    result.duplicates += duplicates;
-    errors.forEach((error) =>
-      result.errors.push({ source: source.name, message: error }),
-    );
-  }
-  return result;
-}
+export { syncSources } from "./scheduler";

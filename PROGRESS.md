@@ -67,3 +67,6 @@ P0闭环已完成，可从主题探索进入资料，或在后台收录、修订
 
 - `30a2dfc`：持久客户端隔离限流与认证审计已推送。
 - 本提交 `feat: ship versioned editorial management and topic curation`：乐观并发、版本差异/回滚到待审核、工程案例与作者编辑、主题CRUD与循环保护、跨主题阅读路径、审计检索、来源同步间隔；8项数据库测试及真实Chromium编辑闭环通过。
+
+- `7cb3c5b`：版本化编辑、回滚、主题管理与审计已推送。
+- 本提交 `feat: make source ingestion resilient and schedulable`：安全代理、条件GET/304、到期调度、持久租约、失败隔离、任务重试、可停止worker；真实MCP SDK feed导入10条待审，第二次304无重复，任务页单源重试浏览器通过；20项采集/网络/调度/AI协议测试通过。依赖升级后全套59项测试通过，npm audit报告0漏洞。

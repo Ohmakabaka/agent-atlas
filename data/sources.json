@@ -130,5 +130,17 @@
     "organizationId": "org-bytedance",
     "description": "长任务 Agent harness 的公开实现，包含沙箱、工具、记忆与子 Agent。",
     "feedUrl": null
+  },
+  {
+    "id": "source-mcp-sdk",
+    "slug": "mcp-sdk-releases",
+    "name": "MCP TypeScript SDK · 发布记录",
+    "type": "repository",
+    "platform": "github",
+    "url": "https://github.com/modelcontextprotocol/typescript-sdk",
+    "feedUrl": "https://github.com/modelcontextprotocol/typescript-sdk/releases.atom",
+    "description": "官方SDK仓库的版本发布Atom源；自动收录进入待审核队列。",
+    "enabled": true,
+    "organizationId": null
   }
 ]

@@ -33,6 +33,7 @@ export class OpenAICompatibleProvider implements LLMProvider {
   name = "openai-compatible";
   constructor(
     private config: { apiKey: string; baseUrl: string; model: string },
+    private transport: typeof safeFetch = safeFetch,
   ) {}
   async generate(metadata: {
     title: string;
@@ -44,7 +45,7 @@ export class OpenAICompatibleProvider implements LLMProvider {
       this.config.baseUrl.replace(/\/+$/, "") + "/chat/completions",
     );
     if (url.protocol !== "https:") throw new Error("模型服务必须使用 HTTPS");
-    const response = await safeFetch(url.href, 0, {
+    const response = await this.transport(url.href, 0, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -85,15 +86,18 @@ export function configuredProvider(): LLMProvider | null {
 
 export async function generateDraft(
   articleId: string,
+  provider: LLMProvider | null = configuredProvider(),
+  database = prisma,
 ): Promise<{ available: boolean; message: string }> {
-  const provider = configuredProvider();
   if (!provider)
     return {
       available: false,
       message:
         "未配置模型 API，仍可手动编辑和发布；规则主题建议已在采集时生成。",
     };
-  const article = await prisma.article.findUnique({ where: { id: articleId } });
+  const article = await database.article.findUnique({
+    where: { id: articleId },
+  });
   if (!article) throw new Error("内容不存在");
   const raw =
     article.rawMetadata &&
@@ -114,7 +118,7 @@ export async function generateDraft(
     !Array.isArray(article.aiDraft)
       ? article.aiDraft
       : {};
-  await prisma.article.update({
+  await database.article.update({
     where: { id: articleId },
     data: {
       aiDraft: {
