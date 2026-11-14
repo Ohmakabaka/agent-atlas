@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { AdminNav } from "@/components/admin-nav";
 import { AdminNotice } from "@/components/admin-notice";
 import { saveSource } from "../actions";
+import { SubmitButton } from "../articles/submit-button";
 import type { Source, Organization } from "@prisma/client";
 function SourceForm({
   source,
@@ -65,6 +66,18 @@ function SourceForm({
           />
         </label>
         <label className="field">
+          检查间隔（分钟）
+          <input
+            className="input"
+            type="number"
+            name="syncIntervalMinutes"
+            min={1}
+            max={10080}
+            required
+            defaultValue={source?.syncIntervalMinutes ?? 60}
+          />
+        </label>
+        <label className="field">
           来源类型
           <input
             className="input"
@@ -117,9 +130,11 @@ function SourceForm({
         />
         启用定期检查（需配置 Feed 地址）
       </label>
-      <button className="button secondary" style={{ justifySelf: "start" }}>
-        {source ? "保存来源" : "添加来源"}
-      </button>
+      <div>
+        <SubmitButton secondary>
+          {source ? "保存来源" : "添加来源"}
+        </SubmitButton>
+      </div>
     </form>
   );
 }
@@ -192,6 +207,19 @@ export default async function SourcesAdmin({
                   {source.feedUrl ? " · 可订阅" : ""}
                 </span>
               </summary>
+              <div className="notice">
+                检查间隔 {source.syncIntervalMinutes} 分钟 · 最近成功{" "}
+                {source.lastSuccessAt
+                  ?.toISOString()
+                  .slice(0, 19)
+                  .replace("T", " ") || "尚无"}
+                {source.lastSuccessAt ? " UTC" : ""}
+                {source.lastError && (
+                  <p style={{ color: "#b84c40" }}>
+                    最近失败：{source.lastError}
+                  </p>
+                )}
+              </div>
               <SourceForm source={source} organizations={organizations} />
             </details>
           </section>

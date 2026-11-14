@@ -15,6 +15,7 @@ export default async function Admin({
   searchParams: Promise<{
     status?: string;
     q?: string;
+    page?: string;
     notice?: string;
     error?: string;
   }>;
@@ -25,25 +26,33 @@ export default async function Admin({
     params.status && Object.hasOwn(labels, params.status)
       ? params.status
       : undefined;
-  const q = params.q?.slice(0, 200).trim();
-  const [articles, counts] = await Promise.all([
+  const q = typeof params.q === "string" ? params.q.slice(0,200).trim() : "";
+  const page = Math.max(
+    1,
+    Math.min(10000, Number.parseInt(params.page || "1", 10) || 1),
+  );
+  const where = {
+    status,
+    ...(q
+      ? {
+          OR: [
+            { title: { contains: q } },
+            { originalTitle: { contains: q } },
+            { summary: { contains: q } },
+          ],
+        }
+      : {}),
+  };
+  const [articles, counts, total] = await Promise.all([
     prisma.article.findMany({
-      where: {
-        status,
-        ...(q
-          ? {
-              OR: [
-                { title: { contains: q } },
-                { originalTitle: { contains: q } },
-              ],
-            }
-          : {}),
-      },
+      where,
       include: { source: true, topics: { include: { topic: true } } },
       orderBy: { updatedAt: "desc" },
-      take: 200,
+      take: 25,
+      skip: (page - 1) * 25,
     }),
     prisma.article.groupBy({ by: ["status"], _count: true }),
+    prisma.article.count({ where }),
   ]);
   return (
     <main className="page-shell" style={{ paddingTop: 36, paddingBottom: 80 }}>
@@ -100,6 +109,9 @@ export default async function Admin({
           清除
         </Link>
       </form>
+      <p className="results-count">
+        找到 {total} 条内容 · 第 {page} 页
+      </p>
       <div className="panel">
         {articles.length ? (
           articles.map((article) => (
@@ -110,6 +122,7 @@ export default async function Admin({
                 borderBottom: "1px solid var(--border, #e4e7e5)",
                 display: "flex",
                 justifyContent: "space-between",
+                flexWrap: "wrap",
                 gap: 20,
                 alignItems: "center",
               }}
@@ -160,9 +173,25 @@ export default async function Admin({
           </div>
         )}
       </div>
-      {articles.length === 200 && (
-        <p className="muted">显示最近更新的 200 条。请用标题或状态缩小范围。</p>
-      )}
+      <nav className="pagination">
+        {page > 1 && (
+          <Link
+            href={`/admin?page=${page - 1}&status=${status || ""}&q=${encodeURIComponent(q || "")}`}
+          >
+            ← 上一页
+          </Link>
+        )}
+        <span>
+          {page} / {Math.max(1, Math.ceil(total / 25))}
+        </span>
+        {page * 25 < total && (
+          <Link
+            href={`/admin?page=${page + 1}&status=${status || ""}&q=${encodeURIComponent(q || "")}`}
+          >
+            下一页 →
+          </Link>
+        )}
+      </nav>
     </main>
   );
 }

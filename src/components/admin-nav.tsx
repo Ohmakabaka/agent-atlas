@@ -23,6 +23,8 @@ export function AdminNav() {
       >
         <Link href="/admin">内容管理</Link>
         <Link href="/admin/import">收录资料</Link>
+        <Link href="/admin/topics">主题管理</Link>
+        <Link href="/admin/audit">操作记录</Link>
         <Link href="/admin/relations">知识关联</Link>
         <Link href="/admin/sources">来源管理</Link>
         <Link href="/admin/jobs">采集记录</Link>

@@ -64,3 +64,6 @@ P0闭环已完成，可从主题探索进入资料，或在后台收录、修订
 
 - `91d9777`：成品化基础迁移与相关度搜索已推送。
 - 本提交 `feat: persist isolated editor rate limits and authentication audit`：按客户端与全局上限持久限流、代理信任边界、登录审计与密码轮换撤销会话；8项认证/SQLite测试通过。
+
+- `30a2dfc`：持久客户端隔离限流与认证审计已推送。
+- 本提交 `feat: ship versioned editorial management and topic curation`：乐观并发、版本差异/回滚到待审核、工程案例与作者编辑、主题CRUD与循环保护、跨主题阅读路径、审计检索、来源同步间隔；8项数据库测试及真实Chromium编辑闭环通过。

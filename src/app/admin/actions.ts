@@ -35,112 +35,86 @@ function finish(path: string, message: string, error = false): never {
 export async function saveArticle(form: FormData) {
   await requireAuth();
   const id = text(form, "id");
-  const path = `/admin/articles/${encodeURIComponent(id)}`;
   let failure = "";
   try {
-    const values = z
-      .object({
-        title: z.string().min(1, "请填写中文标题").max(300),
-        originalTitle: z.string().min(1, "请填写原始标题").max(500),
-        url: webUrl,
-        summary: z.string().max(30000),
-        audience: z.string().max(1000),
-        authorName: z.string().max(300),
-        type: z.enum(["paper", "article", "docs", "repository", "podcast"]),
-        layer: z.enum(["primary", "community", "engineering"]),
-        language: z.enum(["zh", "en", "multilingual"]),
-        quality: z.enum(["curated", "standard"]),
-        status: z.enum([
-          "discovered",
-          "pending_review",
-          "published",
-          "archived",
-        ]),
-      })
-      .parse(
-        Object.fromEntries(
-          [
-            "title",
-            "originalTitle",
-            "url",
-            "summary",
-            "audience",
-            "authorName",
-            "type",
-            "layer",
-            "language",
-            "quality",
-            "status",
-          ].map((k) => [k, text(form, k)]),
-        ),
-      );
-    const topics = [...new Set(form.getAll("topics").map(String))];
-    const existing = await prisma.article.findUniqueOrThrow({ where: { id } });
-    if (topics.length > 80) throw new Error("主题数量超出限制");
-    if (
-      (await prisma.topic.count({ where: { id: { in: topics } } })) !==
-      topics.length
-    )
-      throw new Error("部分主题已不存在，请刷新后重试");
-    if (values.status === "published") {
-      if (values.summary.length < 20 || !/\p{Script=Han}/u.test(values.summary))
-        throw new Error("发布前请撰写至少 20 字的中文导读");
-      if (!/\p{Script=Han}/u.test(values.title))
-        throw new Error("发布前请填写中文标题");
-      if (!topics.length) throw new Error("发布前请至少关联一个技术主题");
-    }
-    const date = text(form, "publishedAt");
-    if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date))
-      throw new Error("发布日期格式不正确");
-    const publishedAt = date ? new Date(`${date}T00:00:00Z`) : null;
-    if (
-      publishedAt &&
-      (Number.isNaN(publishedAt.getTime()) ||
-        publishedAt.toISOString().slice(0, 10) !== date)
-    )
-      throw new Error("发布日期无效");
-    const sourceId = text(form, "sourceId") || null;
-    const source = sourceId
-      ? await prisma.source.findUniqueOrThrow({ where: { id: sourceId } })
-      : null;
-    await prisma.$transaction(async (tx) => {
-      await tx.articleTopic.deleteMany({ where: { articleId: id } });
-      await tx.article.update({
-        where: { id },
-        data: {
-          ...values,
-          publishedAt,
-          sourceId,
-          organizationId: source?.organizationId ?? null,
-          // canonical identity remains the ingestion identity; URL corrections retain old provenance.
-          takeaways: text(form, "takeaways")
-            .split("\n")
-            .map((s) => s.trim())
-            .filter(Boolean)
-            .slice(0, 30),
-          reviewedAt:
-            values.status === "published" ? new Date() : existing.reviewedAt,
-          topics: { create: topics.map((topicId) => ({ topicId })) },
-        },
-      });
-      if (values.url !== existing.url) {
-        const link = await tx.articleLink.findUnique({
-          where: { url: values.url },
-        });
-        if (link && link.articleId !== id)
-          throw new Error("该链接已属于另一篇内容，请先处理重复条目");
-        if (!link)
-          await tx.articleLink.create({
-            data: { articleId: id, url: values.url, label: "人工修订链接" },
-          });
-      }
-    });
+    const { editArticle, parseArticleForm } = await import(
+      "@/lib/editor/articles"
+    );
+    await editArticle(
+      id,
+      Number(text(form, "version")),
+      parseArticleForm(form),
+      text(form, "revisionNote") || "edit",
+    );
   } catch (error) {
     failure = safeMessage(error);
   }
   finish(
-    path,
-    failure || "内容已保存。已发布的修改已同步到公开页面。",
+    `/admin/articles/${encodeURIComponent(id)}`,
+    failure || "内容已保存。版本历史已记录，已发布内容的修改已同步。",
+    !!failure,
+  );
+}
+export async function saveArticleWithFeedback(
+  form: FormData,
+): Promise<{ error?: string; location?: string }> {
+  await requireAuth();
+  const id = text(form, "id");
+  try {
+    const { editArticle, parseArticleForm } = await import(
+      "@/lib/editor/articles"
+    );
+    await editArticle(
+      id,
+      Number(text(form, "version")),
+      parseArticleForm(form),
+      text(form, "revisionNote") || "edit",
+    );
+  } catch (error) {
+    return { error: safeMessage(error) };
+  }
+  revalidatePath("/", "layout");
+  return {
+    location: `/admin/articles/${encodeURIComponent(id)}?notice=${encodeURIComponent("内容已保存。版本历史已记录，已发布内容的修改已同步。")}`,
+  };
+}
+export async function restoreArticleVersion(form: FormData) {
+  await requireAuth();
+  const id = text(form, "id");
+  let failure = "";
+  try {
+    const { restoreArticle } = await import("@/lib/editor/articles");
+    await restoreArticle(
+      id,
+      Number(text(form, "version")),
+      text(form, "revisionId"),
+    );
+  } catch (error) {
+    failure = safeMessage(error);
+  }
+  finish(
+    `/admin/articles/${encodeURIComponent(id)}`,
+    failure || "历史内容已恢复为待审核，新版本已保留。请重新核对后发布。",
+    !!failure,
+  );
+}
+export async function rejectArticle(form: FormData) {
+  await requireAuth();
+  const id = text(form, "id");
+  let failure = "";
+  try {
+    const { rejectArticleReview } = await import("@/lib/editor/articles");
+    await rejectArticleReview(
+      id,
+      Number(text(form, "version")),
+      text(form, "reason"),
+    );
+  } catch (error) {
+    failure = safeMessage(error);
+  }
+  finish(
+    `/admin/articles/${encodeURIComponent(id)}`,
+    failure || "资料已驳回并归档，原因与原版本已保存。",
     !!failure,
   );
 }
@@ -249,10 +223,27 @@ export async function saveSource(form: FormData) {
       feedUrl: values.feedUrl || null,
       enabled: form.get("enabled") === "on",
       organizationId: text(form, "organizationId") || null,
+      syncIntervalMinutes: z.coerce
+        .number()
+        .int()
+        .min(1, "检查间隔至少1分钟")
+        .max(10080, "检查间隔最多10080分钟")
+        .parse(text(form, "syncIntervalMinutes") || "60"),
     };
     const id = text(form, "id");
-    if (id) await prisma.source.update({ where: { id }, data });
-    else await prisma.source.create({ data });
+    await prisma.$transaction(async (tx) => {
+      const saved = id
+        ? await tx.source.update({ where: { id }, data })
+        : await tx.source.create({ data });
+      await tx.auditLog.create({
+        data: {
+          action: id ? "source.update" : "source.create",
+          entityType: "source",
+          entityId: saved.id,
+          detail: { name: saved.name, enabled: saved.enabled },
+        },
+      });
+    });
   } catch (error) {
     failure = safeMessage(error);
   }
@@ -287,6 +278,8 @@ export async function saveRelation(form: FormData) {
         "extends",
         "challenges",
         "related_to",
+        "prerequisite_for",
+        "evolves_from",
       ])
       .parse(text(form, "type"));
     const status = z
@@ -320,8 +313,24 @@ export async function saveRelation(form: FormData) {
       toTopicId: to.kind === "topic" ? to.id : null,
     };
     const id = text(form, "id");
-    if (id) await prisma.relation.update({ where: { id }, data });
-    else await prisma.relation.create({ data });
+    await prisma.$transaction(async (tx) => {
+      const saved = id
+        ? await tx.relation.update({ where: { id }, data })
+        : await tx.relation.create({ data });
+      await tx.auditLog.create({
+        data: {
+          action: id ? "relation.update" : "relation.create",
+          entityType: "relation",
+          entityId: saved.id,
+          detail: {
+            type: saved.type,
+            status: saved.status,
+            from: text(form, "from"),
+            to: text(form, "to"),
+          },
+        },
+      });
+    });
   } catch (error) {
     failure = safeMessage(error);
   }
@@ -336,7 +345,19 @@ export async function deleteRelation(form: FormData) {
   await requireAuth();
   let failure = "";
   try {
-    await prisma.relation.delete({ where: { id: text(form, "id") } });
+    await prisma.$transaction(async (tx) => {
+      const removed = await tx.relation.delete({
+        where: { id: text(form, "id") },
+      });
+      await tx.auditLog.create({
+        data: {
+          action: "relation.delete",
+          entityType: "relation",
+          entityId: removed.id,
+          detail: { type: removed.type, status: removed.status },
+        },
+      });
+    });
   } catch (error) {
     failure = safeMessage(error);
   }

@@ -4,7 +4,8 @@ import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { AdminNav } from "@/components/admin-nav";
 import { AdminNotice } from "@/components/admin-notice";
-import { requestDraft, saveArticle } from "../../actions";
+import { requestDraft, rejectArticle } from "../../actions";
+import { EditorForm, SubmitButton } from "../editor-form";
 const fieldStyle = { display: "grid", gap: 8 } as const;
 export default async function ArticleEditor({
   params,
@@ -15,15 +16,25 @@ export default async function ArticleEditor({
 }) {
   await requireAuth();
   const { id } = await params;
-  const [article, topics, sources, messages] = await Promise.all([
-    prisma.article.findUnique({
-      where: { id },
-      include: { topics: true, links: true },
-    }),
-    prisma.topic.findMany({ orderBy: [{ sortOrder: "asc" }, { name: "asc" }] }),
-    prisma.source.findMany({ orderBy: { name: "asc" } }),
-    searchParams,
-  ]);
+  const [article, topics, sources, organizations, people, messages] =
+    await Promise.all([
+      prisma.article.findUnique({
+        where: { id },
+        include: {
+          topics: true,
+          links: true,
+          engineeringCase: true,
+          people: true,
+        },
+      }),
+      prisma.topic.findMany({
+        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      }),
+      prisma.source.findMany({ orderBy: { name: "asc" } }),
+      prisma.organization.findMany({ orderBy: { name: "asc" } }),
+      prisma.person.findMany({ orderBy: { name: "asc" } }),
+      searchParams,
+    ]);
   if (!article) notFound();
   const topicIds = new Set(article.topics.map((t) => t.topicId));
   const takeaways = Array.isArray(article.takeaways)
@@ -50,17 +61,19 @@ export default async function ArticleEditor({
         )}
       </div>
       <AdminNotice {...messages} />
-      <form
-        action={saveArticle}
-        className="panel"
-        style={{ padding: 28, display: "grid", gap: 24 }}
-      >
+      <div className="notice">
+        当前版本 v{article.version} ·{" "}
+        <Link href={`/admin/articles/${id}/history`}>查看历史与恢复</Link>
+        。恢复历史会重新进入待审核；并发修改不会覆盖已有内容。
+      </div>
+      <EditorForm>
         <input type="hidden" name="id" value={article.id} />
+        <input type="hidden" name="version" value={article.version} />
         <div
           className="form-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
+            gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))",
             gap: 20,
           }}
         >
@@ -118,6 +131,21 @@ export default async function ArticleEditor({
             </select>
           </label>
           <label className="field" style={fieldStyle}>
+            作者所属机构
+            <select
+              className="input"
+              name="organizationId"
+              defaultValue={article.organizationId || ""}
+            >
+              <option value="">未标注机构</option>
+              {organizations.map((org) => (
+                <option value={org.id} key={org.id}>
+                  {org.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field" style={fieldStyle}>
             原文发布日期
             <input
               className="input"
@@ -160,6 +188,84 @@ export default async function ArticleEditor({
         </label>
         <fieldset
           style={{
+            border: "1px solid var(--line)",
+            padding: 20,
+            borderRadius: 8,
+          }}
+        >
+          <legend>关联人物</legend>
+          <div className="check-grid">
+            {people.map((person) => (
+              <label key={person.id}>
+                <input
+                  type="checkbox"
+                  name="people"
+                  value={person.id}
+                  defaultChecked={article.people.some(
+                    (p) => p.personId === person.id,
+                  )}
+                />{" "}
+                {person.name}
+              </label>
+            ))}
+          </div>
+          <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
+            “作者”可填写完整署名；人物关联用于已有作者档案。
+          </p>
+        </fieldset>
+        <fieldset
+          style={{
+            border: "1px solid var(--line)",
+            padding: 20,
+            borderRadius: 8,
+          }}
+        >
+          <legend>工程案例拆解</legend>
+          <label>
+            <input
+              type="checkbox"
+              name="hasEngineeringCase"
+              defaultChecked={!!article.engineeringCase}
+            />{" "}
+            保存工程案例（取消勾选可移除，旧内容保留在版本历史）
+          </label>
+          <div className="form-grid" style={{ marginTop: 15 }}>
+            {[
+              ["problem", "工程问题"],
+              ["architecture", "架构说明"],
+              ["solution", "解决方案"],
+              ["outcome", "效果与局限"],
+            ].map(([name, label]) => (
+              <label className="field" key={name}>
+                {label}
+                <textarea
+                  name={`case_${name}`}
+                  rows={3}
+                  defaultValue={
+                    article.engineeringCase?.[
+                      name as
+                        | "problem"
+                        | "architecture"
+                        | "solution"
+                        | "outcome"
+                    ] || ""
+                  }
+                />
+              </label>
+            ))}
+          </div>
+          <label className="field" style={{ marginTop: 12 }}>
+            案例证据链接
+            <input
+              name="case_evidenceUrl"
+              type="url"
+              className="input"
+              defaultValue={article.engineeringCase?.evidenceUrl || article.url}
+            />
+          </label>
+        </fieldset>
+        <fieldset
+          style={{
             border: "1px solid var(--border, #dfe5e1)",
             padding: 20,
             borderRadius: 10,
@@ -169,7 +275,7 @@ export default async function ArticleEditor({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+              gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,220px),1fr))",
               gap: 12,
             }}
           >
@@ -198,7 +304,7 @@ export default async function ArticleEditor({
           className="form-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+            gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,180px),1fr))",
             gap: 20,
           }}
         >
@@ -267,8 +373,17 @@ export default async function ArticleEditor({
           发布需要中文标题、至少 20
           字中文导读和一个技术主题。已发布内容的编辑会立即生效；归档后从公开页面移除。
         </p>
+        <label className="field">
+          本次修订说明
+          <input
+            name="revisionNote"
+            className="input"
+            maxLength={1000}
+            placeholder="例如：依据原文纠正评测数据，补充工程边界"
+          />
+        </label>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <button className="button">保存内容与审核状态</button>
+          <SubmitButton>保存内容与审核状态</SubmitButton>
           <a
             className="button secondary"
             href={article.url}
@@ -278,7 +393,27 @@ export default async function ArticleEditor({
             核对原文 ↗
           </a>
         </div>
-      </form>
+      </EditorForm>
+      <section className="panel">
+        <details>
+          <summary>驳回与归档</summary>
+          <p className="muted">
+            不符合收录标准的内容将从前台隐藏，原因与原版本保留，不永久删除。
+          </p>
+          <form
+            action={rejectArticle}
+            style={{ display: "grid", gap: 12, marginTop: 15 }}
+          >
+            <input type="hidden" name="id" value={id} />
+            <input type="hidden" name="version" value={article.version} />
+            <label className="field">
+              驳回原因
+              <textarea name="reason" required minLength={5} maxLength={1000} />
+            </label>
+            <SubmitButton secondary>驳回并归档</SubmitButton>
+          </form>
+        </details>
+      </section>
       <section className="panel" style={{ padding: 28, marginTop: 24 }}>
         <h2>机器建议与原始记录</h2>
         <p className="muted">
@@ -286,7 +421,9 @@ export default async function ArticleEditor({
         </p>
         <form action={requestDraft}>
           <input type="hidden" name="id" value={id} />
-          <button className="button secondary">生成中文导读建议</button>
+          <SubmitButton secondary pendingText="正在生成草稿…">
+            生成中文导读建议
+          </SubmitButton>
         </form>
         <details style={{ marginTop: 20 }}>
           <summary>查看机器草稿</summary>

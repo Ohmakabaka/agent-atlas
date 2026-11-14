@@ -13,6 +13,8 @@ const typeLabels: Record<string, string> = {
   extends: "扩展工作",
   challenges: "提出质疑",
   related_to: "主题关联",
+  prerequisite_for: "前置知识",
+  evolves_from: "演进自",
 };
 type Option = { id: string; label: string };
 function RelationForm({
