@@ -178,33 +178,189 @@ test("search clamps pagination and ignores impossible calendar dates", async () 
   assert.equal(leapDay.total, 0);
 });
 
-
 test("weighted relevance ranks titles over newer summary-only matches and paginates stably", async () => {
-  const make = (slug: string, title: string, summary: string, publishedAt: Date) => db.article.create({data:{slug,title,originalTitle:title,url:`https://example.org/${slug}`,canonicalUrl:`https://example.org/${slug}`,summary,status:'published',publishedAt}});
-  const title = await make('rank-title','独有评测词 工程指南','内容介绍',new Date('2020-01-01'));
-  const summary = await make('rank-summary','新发布的指南','独有评测词 只在摘要里',new Date('2026-01-01'));
-  const ranked=await query.searchArticles({q:'独有评测词',limit:1});
-  assert.equal(ranked.sort,'relevance');
-  assert.equal(ranked.total,2);
-  assert.equal(ranked.articles[0].id,title.id);
-  assert.equal((await query.searchArticles({q:'独有评测词',limit:1,page:2})).articles[0].id,summary.id);
-  assert.equal((await query.searchArticles({q:'独有评测词',sort:'newest'})).articles[0].id,summary.id);
-  assert.equal((await query.searchArticles({q:'独有评测词',sort:'oldest'})).articles[0].id,title.id);
-  assert.equal((await query.searchArticles({q:"' OR 1=1 --"})).total,0);
-  assert.ok((await query.searchArticles({q:'SWE-BENCH'})).total>0);
-  await db.article.deleteMany({where:{id:{in:[title.id,summary.id]}}});
+  const make = (
+    slug: string,
+    title: string,
+    summary: string,
+    publishedAt: Date,
+  ) =>
+    db.article.create({
+      data: {
+        slug,
+        title,
+        originalTitle: title,
+        url: `https://example.org/${slug}`,
+        canonicalUrl: `https://example.org/${slug}`,
+        summary,
+        status: "published",
+        publishedAt,
+      },
+    });
+  const title = await make(
+    "rank-title",
+    "独有评测词 工程指南",
+    "内容介绍",
+    new Date("2020-01-01"),
+  );
+  const summary = await make(
+    "rank-summary",
+    "新发布的指南",
+    "独有评测词 只在摘要里",
+    new Date("2026-01-01"),
+  );
+  const ranked = await query.searchArticles({ q: "独有评测词", limit: 1 });
+  assert.equal(ranked.sort, "relevance");
+  assert.equal(ranked.total, 2);
+  assert.equal(ranked.articles[0].id, title.id);
+  assert.equal(
+    (await query.searchArticles({ q: "独有评测词", limit: 1, page: 2 }))
+      .articles[0].id,
+    summary.id,
+  );
+  assert.equal(
+    (await query.searchArticles({ q: "独有评测词", sort: "newest" }))
+      .articles[0].id,
+    summary.id,
+  );
+  assert.equal(
+    (await query.searchArticles({ q: "独有评测词", sort: "oldest" }))
+      .articles[0].id,
+    title.id,
+  );
+  assert.equal((await query.searchArticles({ q: "' OR 1=1 --" })).total, 0);
+  assert.ok((await query.searchArticles({ q: "SWE-BENCH" })).total > 0);
+  await db.article.deleteMany({
+    where: { id: { in: [title.id, summary.id] } },
+  });
 });
 
-test("topic discovery follows all descendants and published reading paths across themes",async()=>{
-  const parent=await db.topic.findUniqueOrThrow({where:{slug:'architecture'}});
-  const child=await db.topic.create({data:{slug:'test-child',name:'Child',englishName:'Child',description:'',question:'',parentId:parent.id}});
-  const grandchild=await db.topic.create({data:{slug:'test-grandchild',name:'Grandchild',englishName:'Grandchild',description:'',question:'',parentId:child.id}});
-  const a=await db.article.create({data:{slug:'deep-topic',title:'深层主题测试',originalTitle:'Nested research',url:'https://example.org/deep-topic',canonicalUrl:'https://example.org/deep-topic',status:'published',type:'paper',publishedAt:new Date(),topics:{create:{topicId:grandchild.id}}}});
-  assert.ok((await query.getTopic('architecture'))?.articles.some(row=>row.id===a.id));
-  assert.ok((await query.searchArticles({topic:'architecture',q:'深层主题测试'})).articles.some(row=>row.id===a.id));
-  assert.ok((await query.getTimeline('architecture','paper')).some(row=>row.id===a.id));
-  assert.ok(!(await query.getTimeline('architecture','docs')).some(row=>row.id===a.id));
-  const selected=await db.topic.create({data:{slug:'cross-path',name:'Cross',englishName:'Cross',description:'',question:'',readingPath:['deep-topic']}});
-  assert.equal((await query.getTopic('cross-path'))?.readingPathArticles[0].id,a.id);
-  await db.article.delete({where:{id:a.id}});await db.topic.deleteMany({where:{id:{in:[selected.id,grandchild.id,child.id]}}});
+test("topic discovery follows all descendants and published reading paths across themes", async () => {
+  const parent = await db.topic.findUniqueOrThrow({
+    where: { slug: "architecture" },
+  });
+  const child = await db.topic.create({
+    data: {
+      slug: "test-child",
+      name: "Child",
+      englishName: "Child",
+      description: "",
+      question: "",
+      parentId: parent.id,
+    },
+  });
+  const grandchild = await db.topic.create({
+    data: {
+      slug: "test-grandchild",
+      name: "Grandchild",
+      englishName: "Grandchild",
+      description: "",
+      question: "",
+      parentId: child.id,
+    },
+  });
+  const a = await db.article.create({
+    data: {
+      slug: "deep-topic",
+      title: "深层主题测试",
+      originalTitle: "Nested research",
+      url: "https://example.org/deep-topic",
+      canonicalUrl: "https://example.org/deep-topic",
+      status: "published",
+      type: "paper",
+      publishedAt: new Date(),
+      topics: { create: { topicId: grandchild.id } },
+    },
+  });
+  assert.ok(
+    (await query.getTopic("architecture"))?.articles.some(
+      (row) => row.id === a.id,
+    ),
+  );
+  assert.ok(
+    (
+      await query.searchArticles({ topic: "architecture", q: "深层主题测试" })
+    ).articles.some((row) => row.id === a.id),
+  );
+  assert.ok(
+    (await query.getTimeline("architecture", "paper")).some(
+      (row) => row.id === a.id,
+    ),
+  );
+  assert.ok(
+    !(await query.getTimeline("architecture", "docs")).some(
+      (row) => row.id === a.id,
+    ),
+  );
+  const selected = await db.topic.create({
+    data: {
+      slug: "cross-path",
+      name: "Cross",
+      englishName: "Cross",
+      description: "",
+      question: "",
+      readingPath: ["deep-topic"],
+    },
+  });
+  assert.equal(
+    (await query.getTopic("cross-path"))?.readingPathArticles[0].id,
+    a.id,
+  );
+  await db.article.delete({ where: { id: a.id } });
+  await db.topic.deleteMany({
+    where: { id: { in: [selected.id, grandchild.id, child.id] } },
+  });
+});
+
+test("knowledge graph only exposes confirmed relations between public endpoints with evidence direction", async () => {
+  const topic = await db.topic.findUniqueOrThrow({
+    where: { slug: "architecture" },
+  });
+  const article = await db.article.findUniqueOrThrow({
+    where: { slug: "react" },
+  });
+  const confirmed = await db.relation.create({
+    data: {
+      type: "prerequisite_for",
+      status: "confirmed",
+      description: "Test editorial prerequisite",
+      evidenceUrl: "https://example.org/evidence",
+      fromArticleId: article.id,
+      toTopicId: topic.id,
+    },
+  });
+  const suggested = await db.relation.create({
+    data: {
+      type: "prerequisite_for",
+      status: "suggested",
+      fromTopicId: topic.id,
+      toArticleId: article.id,
+    },
+  });
+  const graph = await query.getKnowledgeGraph({
+    topic: "architecture",
+    type: "prerequisite_for",
+  });
+  assert.ok(
+    graph.edges.some(
+      (e) =>
+        e.id === confirmed.id &&
+        e.from === `article:${article.id}` &&
+        e.to === `topic:${topic.id}`,
+    ),
+  );
+  assert.ok(!graph.edges.some((e) => e.id === suggested.id));
+  assert.ok(graph.nodes.some((n) => n.href === "/articles/react"));
+  const all = await query.getKnowledgeGraph();
+  assert.ok(all.nodes.every((n) => !n.label.includes("绝密隐藏测试")));
+  assert.ok(
+    !all.edges.some((e) => e.id === "relation-suggested-community-context"),
+  );
+  assert.equal(
+    (await query.getKnowledgeGraph({ topic: "does-not-exist" })).total,
+    0,
+  );
+  await db.relation.deleteMany({
+    where: { id: { in: [confirmed.id, suggested.id] } },
+  });
 });

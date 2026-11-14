@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Navigation } from "@/components/navigation";
 import "./globals.css";
+import { siteOrigin } from "@/lib/search/seo";
 export const metadata: Metadata = {
+  ...(siteOrigin() ? { metadataBase: new URL(siteOrigin()!) } : {}),
   title: {
     default: "Agent Atlas · Agent 技术图谱",
     template: "%s · Agent Atlas",
@@ -36,6 +38,7 @@ export default function RootLayout({
           </div>
           <div>
             <span>开放知识 · 保留出处 · 持续演进</span>
+            <Link href="/about">关于图谱与编辑准则</Link>
             <a
               href="https://github.com/Ohmakabaka/agent-atlas"
               target="_blank"

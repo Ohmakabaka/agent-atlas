@@ -70,3 +70,6 @@ P0闭环已完成，可从主题探索进入资料，或在后台收录、修订
 
 - `7cb3c5b`：版本化编辑、回滚、主题管理与审计已推送。
 - 本提交 `feat: make source ingestion resilient and schedulable`：安全代理、条件GET/304、到期调度、持久租约、失败隔离、任务重试、可停止worker；真实MCP SDK feed导入10条待审，第二次304无重复，任务页单源重试浏览器通过；20项采集/网络/调度/AI协议测试通过。依赖升级后全套59项测试通过，npm audit报告0漏洞。
+
+- `806f7ee`：可靠采集、条件同步与worker已推送。
+- 本提交 `feat: complete knowledge graph and personal reading workspace`：真实有向证据图、10种关系、节点聚焦/列表、阅读收藏/已读/JSON导入导出、RSS与站点地图、动态SEO/JSON-LD、编辑准则；查询/SEO/阅读/Feed测试与生产Chromium通过，修复React19 SVG标题水合错误，移动布局无溢出。

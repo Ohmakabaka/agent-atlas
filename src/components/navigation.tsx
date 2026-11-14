@@ -8,6 +8,8 @@ import {
   Library,
   ArrowUpRight,
   Aperture,
+  Network,
+  Bookmark,
 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 export function Navigation() {
@@ -30,6 +32,8 @@ export function Navigation() {
             ["/explore", "探索资料", Search],
             ["/timeline", "技术演进", GitBranch],
             ["/sources", "来源目录", Library],
+            ["/graph", "知识关联", Network],
+            ["/library", "阅读库", Bookmark],
           ].map(([href, label, Icon]) => {
             const I = Icon as typeof Compass;
             return (

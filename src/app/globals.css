@@ -1323,3 +1323,69 @@ input[type="checkbox"] {
     transition: none !important;
   }
 }
+
+.reading-toolbar {
+  margin: 14px 0 24px;
+}
+.library-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.library-tools .actions {
+  margin: 0;
+}
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+}
+.filter-tabs button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 7px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.filter-tabs button.selected {
+  background: var(--soft);
+  color: var(--accent);
+}
+.notice.error {
+  color: #b44b40;
+  background: #b44b400d;
+}
+.site-header nav {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.site-header nav a {
+  flex-shrink: 0;
+}
+.site-header nav::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 720px) {
+  .site-header nav {
+    justify-content: flex-start;
+    gap: 22px;
+  }
+  .reading-toolbar .actions {
+    gap: 6px;
+  }
+  .reading-toolbar .button {
+    padding: 8px 10px;
+  }
+  .library-tools {
+    align-items: stretch;
+  }
+  .filter-tabs button {
+    padding: 7px 12px;
+  }
+}

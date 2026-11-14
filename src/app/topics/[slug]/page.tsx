@@ -1,16 +1,43 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+import { cache } from "react";
+import { canonicalPath, siteOrigin } from "@/lib/search/seo";
+import { relationLabels } from "@/lib/search/relations";
 import { notFound } from "next/navigation";
 import { getTopic } from "@/lib/queries";
 import { strings, layers } from "@/lib/labels";
 import { ArticleCard } from "@/components/article-card";
 export const dynamic = "force-dynamic";
+const loadTopic = cache(getTopic);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const topic = await loadTopic((await params).slug);
+  return topic
+    ? {
+        title: topic.name,
+        description: topic.description.slice(0, 170),
+        ...(siteOrigin()
+          ? { alternates: { canonical: canonicalPath("topics", topic.slug) } }
+          : {}),
+        openGraph: {
+          title: topic.name,
+          description: topic.description.slice(0, 170),
+          locale: "zh_CN",
+          type: "website",
+        },
+      }
+    : { title: "主题未找到", robots: { index: false, follow: false } };
+}
 export default async function TopicPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const t = await getTopic(slug);
+  const t = await loadTopic(slug);
   if (!t) notFound();
   const groups = ["primary", "community", "engineering"];
   return (
@@ -152,6 +179,17 @@ export default async function TopicPage({
             >
               查看技术演进 ↗
             </Link>
+            <Link
+              href={`/graph?topic=${t.slug}`}
+              style={{
+                display: "block",
+                textAlign: "center",
+                marginTop: 14,
+                fontSize: 12,
+              }}
+            >
+              探索知识关系图 ↗
+            </Link>
           </div>
           <div className="panel">
             <h3>知识连接</h3>
@@ -166,6 +204,7 @@ export default async function TopicPage({
                 article: r.toArticle,
                 description: r.description,
                 evidence: r.evidenceUrl,
+                direction: "出向",
               })),
               ...t.incoming.map((r) => ({
                 id: r.id,
@@ -174,10 +213,13 @@ export default async function TopicPage({
                 article: r.fromArticle,
                 description: r.description,
                 evidence: r.evidenceUrl,
+                direction: "入向",
               })),
             ].map((r) => (
               <div className="relation" key={r.id}>
-                <div className="relation-label">{r.type} · 已确认</div>
+                <div className="relation-label">
+                  {relationLabels[r.type] || r.type} · {r.direction} · 已确认
+                </div>
                 {r.topic ? (
                   <Link href={`/topics/${r.topic.slug}`}>
                     {r.topic.name} ↗

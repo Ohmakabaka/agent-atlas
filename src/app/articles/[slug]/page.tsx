@@ -1,20 +1,40 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+import { cache } from "react";
+import { articleMetadata, articleJsonLd, escapeJsonLd } from "@/lib/search/seo";
+import { relationLabels } from "@/lib/search/relations";
+import { ReadingControls } from "@/components/reading-controls";
 import { notFound } from "next/navigation";
 import Markdown from "react-markdown";
 import { getArticle } from "@/lib/queries";
 import { date, layers, types, strings } from "@/lib/labels";
 import { ArticleCard } from "@/components/article-card";
 export const dynamic = "force-dynamic";
+const loadArticle = cache(getArticle);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const article = await loadArticle((await params).slug);
+  return article
+    ? articleMetadata(article)
+    : { title: "资料未找到", robots: { index: false, follow: false } };
+}
 export default async function ArticlePage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const a = await getArticle(slug);
+  const a = await loadArticle(slug);
   if (!a) notFound();
   return (
     <main className="page-shell">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: escapeJsonLd(articleJsonLd(a)) }}
+      />
       <div className="breadcrumb">
         <Link href="/explore">探索资料</Link>
         <span>/</span>
@@ -37,6 +57,7 @@ export default async function ArticlePage({
             </Link>
           ))}
         </div>
+        <ReadingControls article={{ slug: a.slug, title: a.title }} />
       </header>
       <div className="two-column">
         <div>
@@ -175,7 +196,7 @@ export default async function ArticlePage({
             ].map((r) => (
               <div className="relation" key={r.id}>
                 <p className="relation-label">
-                  {r.type} · {r.direction} · 已确认
+                  {relationLabels[r.type] || r.type} · {r.direction} · 已确认
                 </p>
                 {r.article && (
                   <Link href={`/articles/${r.article.slug}`}>
