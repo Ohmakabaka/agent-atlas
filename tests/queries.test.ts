@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
-import { createClient } from "@libsql/client";
+import { initializeDatabase } from "./helpers/database";
 
 let dir: string;
 let db: typeof import("../src/lib/db").prisma;
@@ -19,14 +19,7 @@ function seed() {
 before(async () => {
   dir = await mkdtemp(join(tmpdir(), "agent-atlas-queries-"));
   process.env.DATABASE_URL = `file:${join(dir, "test.db")}`;
-  const client = createClient({ url: process.env.DATABASE_URL });
-  await client.executeMultiple(
-    await readFile(
-      "prisma/migrations/20261114000000_init/migration.sql",
-      "utf8",
-    ),
-  );
-  client.close();
+  await initializeDatabase(process.env.DATABASE_URL);
   seed();
   db = (await import("../src/lib/db")).prisma;
   query = await import("../src/lib/queries");
@@ -183,4 +176,35 @@ test("search clamps pagination and ignores impossible calendar dates", async () 
     to: "2024-02-29",
   });
   assert.equal(leapDay.total, 0);
+});
+
+
+test("weighted relevance ranks titles over newer summary-only matches and paginates stably", async () => {
+  const make = (slug: string, title: string, summary: string, publishedAt: Date) => db.article.create({data:{slug,title,originalTitle:title,url:`https://example.org/${slug}`,canonicalUrl:`https://example.org/${slug}`,summary,status:'published',publishedAt}});
+  const title = await make('rank-title','独有评测词 工程指南','内容介绍',new Date('2020-01-01'));
+  const summary = await make('rank-summary','新发布的指南','独有评测词 只在摘要里',new Date('2026-01-01'));
+  const ranked=await query.searchArticles({q:'独有评测词',limit:1});
+  assert.equal(ranked.sort,'relevance');
+  assert.equal(ranked.total,2);
+  assert.equal(ranked.articles[0].id,title.id);
+  assert.equal((await query.searchArticles({q:'独有评测词',limit:1,page:2})).articles[0].id,summary.id);
+  assert.equal((await query.searchArticles({q:'独有评测词',sort:'newest'})).articles[0].id,summary.id);
+  assert.equal((await query.searchArticles({q:'独有评测词',sort:'oldest'})).articles[0].id,title.id);
+  assert.equal((await query.searchArticles({q:"' OR 1=1 --"})).total,0);
+  assert.ok((await query.searchArticles({q:'SWE-BENCH'})).total>0);
+  await db.article.deleteMany({where:{id:{in:[title.id,summary.id]}}});
+});
+
+test("topic discovery follows all descendants and published reading paths across themes",async()=>{
+  const parent=await db.topic.findUniqueOrThrow({where:{slug:'architecture'}});
+  const child=await db.topic.create({data:{slug:'test-child',name:'Child',englishName:'Child',description:'',question:'',parentId:parent.id}});
+  const grandchild=await db.topic.create({data:{slug:'test-grandchild',name:'Grandchild',englishName:'Grandchild',description:'',question:'',parentId:child.id}});
+  const a=await db.article.create({data:{slug:'deep-topic',title:'深层主题测试',originalTitle:'Nested research',url:'https://example.org/deep-topic',canonicalUrl:'https://example.org/deep-topic',status:'published',type:'paper',publishedAt:new Date(),topics:{create:{topicId:grandchild.id}}}});
+  assert.ok((await query.getTopic('architecture'))?.articles.some(row=>row.id===a.id));
+  assert.ok((await query.searchArticles({topic:'architecture',q:'深层主题测试'})).articles.some(row=>row.id===a.id));
+  assert.ok((await query.getTimeline('architecture','paper')).some(row=>row.id===a.id));
+  assert.ok(!(await query.getTimeline('architecture','docs')).some(row=>row.id===a.id));
+  const selected=await db.topic.create({data:{slug:'cross-path',name:'Cross',englishName:'Cross',description:'',question:'',readingPath:['deep-topic']}});
+  assert.equal((await query.getTopic('cross-path'))?.readingPathArticles[0].id,a.id);
+  await db.article.delete({where:{id:a.id}});await db.topic.deleteMany({where:{id:{in:[selected.id,grandchild.id,child.id]}}});
 });

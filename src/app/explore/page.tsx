@@ -4,6 +4,9 @@ import { searchArticles } from "@/lib/queries";
 import { prisma } from "@/lib/db";
 import { layers, types, qualities } from "@/lib/labels";
 import { ArticleCard } from "@/components/article-card";
+import { searchSorts } from "@/lib/search/query";
+import type { Metadata } from "next";
+export const metadata: Metadata = { title: "探索资料", description: "按主题、机构、语言和类型组合筛选 Agent 技术资料。", robots: {index: false, follow: true} };
 export const dynamic = "force-dynamic";
 type Params = Record<string, string | string[] | undefined>;
 export default async function Explore({
@@ -97,6 +100,7 @@ export default async function Explore({
               { value: "en", label: "英文" },
             ])}
             {options("quality", "质量等级", dict(qualities))}
+            <div className="field"><label htmlFor="sort">排序方式</label><select id="sort" name="sort" defaultValue={r.sort}>{Object.entries(searchSorts).map(([value,label])=><option value={value} key={value}>{label}</option>)}</select></div>
             <div className="field">
               <label htmlFor="from">发布起始日期</label>
               <input id="from" type="date" name="from" defaultValue={p.from} />
@@ -144,7 +148,7 @@ export default async function Explore({
           <p className="results-count">
             找到 <strong style={{ color: "var(--ink)" }}>{r.total}</strong>{" "}
             条已审核资料 {p.q && <> · “{p.q}”</>}
-            <span style={{ float: "right" }}>按原文发布日期排序</span>
+            <span style={{ float: "right" }}>{searchSorts[r.sort]}</span>
           </p>
           {r.articles.length ? (
             <div className="article-list">

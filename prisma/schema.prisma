@@ -58,6 +58,11 @@ model Source {
   description    String @default("")
   enabled        Boolean @default(true)
   lastCheckedAt  DateTime?
+  lastSuccessAt  DateTime?
+  lastError      String?
+  etag           String?
+  lastModified   String?
+  syncIntervalMinutes Int @default(60)
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   articles       Article[]
@@ -82,6 +87,7 @@ model Article {
   publishedAt    DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  version        Int @default(1)
   reviewedAt     DateTime?
   authorName     String @default("")
   rawMetadata    Json @default("{}")
@@ -94,6 +100,7 @@ model Article {
   people         ArticlePerson[]
   links          ArticleLink[]
   engineeringCase EngineeringCase?
+  revisions      ArticleRevision[]
   outgoing       Relation[] @relation("FromArticle")
   incoming       Relation[] @relation("ToArticle")
   @@index([status, publishedAt])
@@ -168,4 +175,37 @@ model IngestionJob {
   failed      Int @default(0)
   error       String?
   details     Json @default("{}")
+}
+
+model ArticleRevision {
+  id        String @id @default(cuid())
+  articleId String
+  version   Int
+  snapshot  Json
+  reason    String @default("edit")
+  createdAt DateTime @default(now())
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  @@unique([articleId, version])
+}
+
+model AuditLog {
+  id         String @id @default(cuid())
+  action     String
+  entityType String
+  entityId   String
+  detail     Json @default("{}")
+  createdAt  DateTime @default(now())
+  @@index([createdAt])
+}
+
+model RateLimit {
+  key         String @id
+  count       Int
+  windowStart DateTime
+}
+
+model SyncLease {
+  key       String @id
+  owner     String
+  expiresAt DateTime
 }

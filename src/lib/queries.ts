@@ -1,7 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "./db";
+import { keywordSql, normalizeSearch, resolveSearchSort } from "./search/query";
 
-const publicRelationWhere: Prisma.RelationWhereInput = {
+export const publicRelationWhere: Prisma.RelationWhereInput = {
   status: "confirmed",
   AND: [
     { OR: [{ fromArticleId: null }, { fromArticle: { status: "published" } }] },
@@ -94,7 +95,7 @@ export async function getTopic(slug: string) {
     },
   });
   if (!topic) return null;
-  const topicIds = [topic.id, ...topic.children.map((t) => t.id)];
+  const topicIds = await getTopicDescendantIds(slug);
   const articles = await prisma.article.findMany({
     where: {
       status: "published",
@@ -104,8 +105,9 @@ export async function getTopic(slug: string) {
     orderBy: { publishedAt: "desc" },
   });
   const pathSlugs = parseStringList(topic.readingPath);
+  const pathArticles = await prisma.article.findMany({ where: { status: "published", slug: { in: pathSlugs } }, include: articleInclude });
   const readingPath = pathSlugs
-    .map((slug) => articles.find((a) => a.slug === slug))
+    .map((slug) => pathArticles.find((a) => a.slug === slug))
     .filter((a): a is ArticleWithRelations => !!a);
   return { ...topic, articles, readingPathArticles: readingPath };
 }
@@ -156,6 +158,7 @@ export type SearchFilters = {
   to?: string;
   page?: number;
   limit?: number;
+  sort?: string;
 };
 function validDate(value?: string) {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
@@ -171,71 +174,48 @@ function boundedInteger(value: unknown, fallback: number, maximum: number) {
     ? Math.min(maximum, Math.max(1, Math.floor(parsed)))
     : fallback;
 }
+/** Recursive UNION terminates even if externally edited data contains a cycle. */
+export async function getTopicDescendantIds(slug: string): Promise<string[]> {
+  const rows = await prisma.$queryRaw<{id: string}[]>(Prisma.sql`
+    WITH RECURSIVE descendants(id) AS (
+      SELECT id FROM "Topic" WHERE slug = ${slug}
+      UNION SELECT t.id FROM "Topic" t JOIN descendants d ON t."parentId" = d.id
+    ) SELECT id FROM descendants`);
+  return rows.map(row => row.id);
+}
 export async function searchArticles(filters: SearchFilters = {}) {
-  const q = filters.q?.trim().slice(0, 200);
-  const where: Prisma.ArticleWhereInput = { status: "published" };
-  if (q)
-    where.AND = q
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((term) => ({
-        OR: [
-          { title: { contains: term } },
-          { originalTitle: { contains: term } },
-          { summary: { contains: term } },
-          { authorName: { contains: term } },
-          {
-            topics: {
-              some: {
-                topic: {
-                  OR: [
-                    { name: { contains: term } },
-                    { englishName: { contains: term } },
-                  ],
-                },
-              },
-            },
-          },
-        ],
-      }));
-  if (filters.topic)
-    where.topics = {
-      some: {
-        topic: {
-          OR: [{ slug: filters.topic }, { parent: { slug: filters.topic } }],
-        },
-      },
-    };
-  if (filters.source) where.source = { slug: filters.source };
-  if (filters.platform)
-    where.source = {
-      ...((where.source as Prisma.SourceWhereInput) ?? {}),
-      platform: filters.platform,
-    };
-  if (filters.organization) where.organization = { slug: filters.organization };
-  for (const key of ["type", "layer", "language", "quality"] as const)
-    if (filters[key]) where[key] = filters[key];
-  const from = validDate(filters.from),
-    to = validDate(filters.to);
+  const { query, terms } = normalizeSearch(filters.q);
+  const keyword = keywordSql(terms, query);
+  const conditions: Prisma.Sql[] = [Prisma.sql`a.status = 'published'`, keyword.match];
+  if (filters.topic) {
+    const ids = await getTopicDescendantIds(filters.topic);
+    conditions.push(ids.length ? Prisma.sql`EXISTS (SELECT 1 FROM "ArticleTopic" at WHERE at."articleId" = a.id AND at."topicId" IN (${Prisma.join(ids)}))` : Prisma.sql`1 = 0`);
+  }
+  if (filters.source) conditions.push(Prisma.sql`s.slug = ${filters.source}`);
+  if (filters.platform) conditions.push(Prisma.sql`s.platform = ${filters.platform}`);
+  if (filters.organization) conditions.push(Prisma.sql`o.slug = ${filters.organization}`);
+  if (filters.type) conditions.push(Prisma.sql`a.type = ${filters.type}`);
+  if (filters.layer) conditions.push(Prisma.sql`a.layer = ${filters.layer}`);
+  if (filters.language) conditions.push(Prisma.sql`a.language = ${filters.language}`);
+  if (filters.quality) conditions.push(Prisma.sql`a.quality = ${filters.quality}`);
+  const from = validDate(filters.from), to = validDate(filters.to);
   if (to) to.setUTCHours(23, 59, 59, 999);
-  if (from || to)
-    where.publishedAt = {
-      ...(from ? { gte: from } : {}),
-      ...(to ? { lte: to } : {}),
-    };
+  if (from) conditions.push(Prisma.sql`julianday(a."publishedAt") >= julianday(${from.toISOString()})`);
+  if (to) conditions.push(Prisma.sql`julianday(a."publishedAt") <= julianday(${to.toISOString()})`);
   const limit = boundedInteger(filters.limit, 12, 60);
   const page = boundedInteger(filters.page, 1, 100_000);
-  const [articles, total] = await Promise.all([
-    prisma.article.findMany({
-      where,
-      include: articleInclude,
-      orderBy: { publishedAt: "desc" },
-      take: limit,
-      skip: (page - 1) * limit,
-    }),
-    prisma.article.count({ where }),
+  const sort = resolveSearchSort(filters.sort, !!query);
+  const base = Prisma.sql`FROM "Article" a LEFT JOIN "Source" s ON s.id = a."sourceId" LEFT JOIN "Organization" o ON o.id = a."organizationId" WHERE ${Prisma.join(conditions, ' AND ')}`;
+  const ordering = sort === 'relevance' ? Prisma.sql`score DESC, a."publishedAt" DESC, a.id ASC` : sort === 'oldest' ? Prisma.sql`a."publishedAt" IS NULL ASC, a."publishedAt" ASC, a.id ASC` : Prisma.sql`a."publishedAt" DESC, a.id ASC`;
+  const [ranked, counts] = await Promise.all([
+    prisma.$queryRaw<{id: string; score: number}[]>(Prisma.sql`SELECT a.id, ${keyword.score} AS score ${base} ORDER BY ${ordering} LIMIT ${limit} OFFSET ${(page - 1) * limit}`),
+    prisma.$queryRaw<{total: number | bigint}[]>(Prisma.sql`SELECT count(*) AS total ${base}`),
   ]);
-  return { articles, total, page, limit, pages: Math.ceil(total / limit) };
+  const records = ranked.length ? await prisma.article.findMany({where: {id: {in: ranked.map(row => row.id)}, status: 'published'}, include: articleInclude}) : [];
+  const byId = new Map(records.map(article => [article.id, article]));
+  const articles = ranked.flatMap(row => {const article = byId.get(row.id); return article ? [article] : []});
+  const total = Number(counts[0]?.total || 0);
+  return { articles, total, page, limit, pages: Math.ceil(total / limit), sort };
 }
 export async function getSources() {
   return prisma.source.findMany({
@@ -250,24 +230,15 @@ export async function getSources() {
     orderBy: { name: "asc" },
   });
 }
-export async function getTimeline(topicSlug?: string) {
+export async function getTimeline(topicSlug?: string, type?: string) {
+  const ids = topicSlug ? await getTopicDescendantIds(topicSlug) : undefined;
   return prisma.article.findMany({
     where: {
-      status: "published",
-      publishedAt: { not: null },
-      ...(topicSlug
-        ? {
-            topics: {
-              some: {
-                topic: {
-                  OR: [{ slug: topicSlug }, { parent: { slug: topicSlug } }],
-                },
-              },
-            },
-          }
-        : {}),
+      status: 'published', publishedAt: { not: null },
+      ...(ids ? {topics: {some: {topicId: {in: ids}}}} : {}),
+      ...(type ? {type} : {}),
     },
     include: articleInclude,
-    orderBy: { publishedAt: "desc" },
+    orderBy: [{ publishedAt: 'desc' }, {id: 'asc'}],
   });
 }

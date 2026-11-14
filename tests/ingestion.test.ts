@@ -1,4 +1,5 @@
 import test from "node:test";
+import { initializeDatabase } from "./helpers/database";
 import assert from "node:assert/strict";
 import {
   canonicalizeUrl,
@@ -172,14 +173,7 @@ test("pipeline preserves review boundary, duplicate identity and job results in 
   const url = `file:${join(directory, "test.db")}`;
   const oldDatabase = process.env.DATABASE_URL;
   process.env.DATABASE_URL = url;
-  const bootstrap = createClient({ url });
-  await bootstrap.executeMultiple(
-    await readFile(
-      "prisma/migrations/20261114000000_init/migration.sql",
-      "utf8",
-    ),
-  );
-  bootstrap.close();
+  await initializeDatabase(url);
   const { prisma } = await import("../src/lib/db");
   const { importUrl, importBatch, ingestItem, syncSources } = await import(
     "../src/lib/ingestion"
